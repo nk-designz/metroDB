@@ -27,19 +27,13 @@ func newLogdServer() pb.LogdServer {
 
 func (server *LogdServer) Append(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
 	reply := new(pb.SetReply)
-	reply. = server.Log.append(request)
+	reply.Offset = server.Log.append(request.Entry)
 	return reply, nil
 }
 
-func (server *LogdServer) ReadEntryAt(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
-	reply := new(pb.LogdReply)
-	reply.Data = server.Log.get(request.Data)
-	return reply, nil
-}
-
-func (server *LogdServer) ReadEntryLast(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
-	reply := new(pb.LogdReply)
-	reply.Data = server.Log.get(server.Log.LastOffset)
+func (server *LogdServer) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetReply, error) {
+	reply := new(pb.GetReply)
+	reply.Entry = server.Log.get(request.Offset)
 	return reply, nil
 }
 

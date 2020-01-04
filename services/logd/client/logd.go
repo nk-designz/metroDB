@@ -27,6 +27,10 @@ func (newInstance *Logd) Close() {
 	defer newInstance.connection.Close()
 }
 
+func (newInstance *Logd) GetClient() *grpc.ClientConn {
+	return newInstance.connection
+}
+
 func New(address string) *Logd {
 	instance := new(Logd)
 	instance.address = fmt.Sprintf("%s:7558", address)

@@ -6,5 +6,5 @@ import (
 
 func main() {
 	logdServer := logd.New("127.0.0.1")
-	
+	logdServer.Connect()
 }

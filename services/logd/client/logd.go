@@ -28,26 +28,26 @@ func (newInstance *Logd) Close() {
 	defer newInstance.connection.Close()
 }
 
-func (newInstance *Logd) Append(entry []byte) []byte {
-	offset, err := newInstance.client.Append(context.Background(), &pb.LogdRequest{Data: entry})
+func (newInstance *Logd) Append(entry []byte) int64 {
+	offset, err := newInstance.client.Append(context.Background(), &pb.SetRequest{Entry: entry})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return offset.Data
+	return offset.Offset
 }
 
-func (newInstance *Logd) Get(offset []byte) []byte {
-	var entry *pb.LogdReply
+func (newInstance *Logd) Get(offset ...int64) []byte {
+	var entry *pb.GetReply
 	var err error
-	if offset == nil {
-		entry, err = newInstance.client.ReadEntryLast(context.Background(), &pb.LogdRequest{Data: nil})
+	if len(offset) == 0 {
+		entry, err = newInstance.client.Get(context.Background(), &pb.GetRequest{})
 	} else {
-		entry, err = newInstance.client.ReadEntryAt(context.Background(), &pb.LogdRequest{Data: offset})
+		entry, err = newInstance.client.Get(context.Background(), &pb.GetRequest{Offset: offset[0]})
 	}
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return entry.Data
+	return entry.Entry
 }
 
 func New(address string) *Logd {

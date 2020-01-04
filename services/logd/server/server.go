@@ -25,9 +25,9 @@ func newLogdServer() pb.LogdServer {
 	return logdServer
 }
 
-func (server *LogdServer) Append(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
-	reply := new(pb.LogdReply)
-	reply.Data = server.Log.append(request.Data)
+func (server *LogdServer) Append(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
+	reply := new(pb.SetReply)
+	reply. = server.Log.append(request)
 	return reply, nil
 }
 

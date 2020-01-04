@@ -1,4 +1,4 @@
-package logd
+package main
 
 import (
 	"context"
@@ -6,16 +6,18 @@ import (
 	"log"
 	"net"
 
+	logd "github.com/nk-designz/metroDB/services/logd/logd"
 	pb "github.com/nk-designz/metroDB/services/logd/pb"
 	"google.golang.org/grpc"
 )
 
 type LogdServer struct {
-	LogStore *LogStore
+	LogStore *logd.LogStore
 }
 
 func newLogdServer() pb.LogdServer {
 	logdServer := new(LogdServer)
+	logdServer.LogStore := new(logd.LogStore)
 	logdServer.LogStore.open()
 	return logdServer
 }
@@ -32,7 +34,7 @@ func (s *LogdServer) ReadEntryAt(ctx context.Context, request *pb.LogdRequest) (
 	return reply, nil
 }
 
-func (s *LogdServer) ReadlastEntry(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
+func (s *LogdServer) ReadEntryLast(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
 	reply := new(pb.LogdReply)
 	reply.Data = s.LogStore.get(s.LogStore.LastOffset)
 	return reply, nil

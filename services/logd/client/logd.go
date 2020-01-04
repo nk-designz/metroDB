@@ -27,8 +27,8 @@ func (newInstance *Logd) Close() {
 	defer newInstance.connection.Close()
 }
 
-func (newInstance *Logd) GetClient() *grpc.ClientConn {
-	return newInstance.connection
+func (newInstance *Logd) GetClient() pb.LogdClient {
+	return newInstance.client
 }
 
 func New(address string) *Logd {

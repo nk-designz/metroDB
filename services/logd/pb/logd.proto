@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service Logd {
+    rpc append (LogdRequest) returns (LogdReply) {}
+    rpc readEntryAt (LogdRequest) returns (LogdReply) {}
+    rpc readEntryLast (LogdRequest) returns (LogdReply) {}
+}
+
+message LogdRequest {
+    bytes data = 1;
+}
+
+message LogdReply {
+    bytes data = 1;
+}

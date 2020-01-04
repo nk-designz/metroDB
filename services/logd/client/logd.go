@@ -1,6 +1,7 @@
 package logd
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -27,8 +28,26 @@ func (newInstance *Logd) Close() {
 	defer newInstance.connection.Close()
 }
 
-func (newInstance *Logd) GetClient() pb.LogdClient {
-	return newInstance.client
+func (newInstance *Logd) Append(entry []byte) []byte {
+	offset, err := newInstance.client.Append(context.Background(), &pb.LogdRequest{Data: entry})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return offset.Data
+}
+
+func (newInstance *Logd) Get(offset []byte) []byte {
+	var entry *pb.LogdReply
+	var err error
+	if offset == nil {
+		entry, err = newInstance.client.ReadEntryLast(context.Background(), &pb.LogdRequest{Data: nil})
+	} else {
+		entry, err = newInstance.client.ReadEntryAt(context.Background(), &pb.LogdRequest{Data: offset})
+	}
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return entry.Data
 }
 
 func New(address string) *Logd {

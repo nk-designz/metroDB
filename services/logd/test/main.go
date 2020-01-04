@@ -10,7 +10,7 @@ func main() {
 	logdServer := logd.New("127.0.0.1")
 	logdServer.Connect()
 	offset := logdServer.Append([]byte("This is a test"))
-	entry := logdServer.Get(offset)
+	entry := logdServer.Get()
 	fmt.Println(
 		fmt.Sprintf(
 			"%x : %x",

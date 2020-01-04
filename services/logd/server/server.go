@@ -6,18 +6,21 @@ import (
 	"log"
 	"net"
 
-	logd "github.com/nk-designz/metroDB/services/logd/logd"
 	pb "github.com/nk-designz/metroDB/services/logd/pb"
 	"google.golang.org/grpc"
 )
 
+const (
+	PORT = 7558
+)
+
 type LogdServer struct {
-	Log *logd.LogStore
+	Log *Log
 }
 
 func newLogdServer() pb.LogdServer {
 	logdServer := new(LogdServer)
-	logdServer.Log = new(logd.LogStore)
+	logdServer.Log = new(Log)
 	logdServer.Log.open()
 	return logdServer
 }
@@ -36,16 +39,17 @@ func (server *LogdServer) ReadEntryAt(ctx context.Context, request *pb.LogdReque
 
 func (server *LogdServer) ReadEntryLast(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
 	reply := new(pb.LogdReply)
-	reply.Data = server.Log.get(s.LogStore.LastOffset)
+	reply.Data = server.Log.get(server.Log.LastOffset)
 	return reply, nil
 }
 
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 70558))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatalf(fmt.Sprintf(`msg="Failed running server" port="%d" error="%v"`, PORT, err))
 	}
+	log.Println(fmt.Sprintf(`msg="Running server" port="%d"`, PORT))
 	grpcServer := grpc.NewServer()
-	pb.RegisterLogdServer(grpcServer, &LogdServer{})
+	pb.RegisterLogdServer(grpcServer, newLogdServer())
 	grpcServer.Serve(lis)
 }

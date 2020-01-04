@@ -1,4 +1,4 @@
-package logd
+package main
 
 import (
 	"encoding/binary"

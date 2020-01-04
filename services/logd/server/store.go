@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"unsafe"
 )
 
 const (
@@ -35,7 +34,7 @@ func (logdlog *Log) open() {
 	// Add Logger File to Logd
 	file, err := os.OpenFile(
 		fmt.Sprintf("%slog.db", os.Getenv("LOGD_DB_PATH")),
-		os.O_CREATE|os.O_APPEND|os.O_WRONLY,
+		os.O_CREATE|os.O_RDWR|os.O_APPEND,
 		0600)
 	if err != nil {
 		log.Fatal(err)
@@ -52,9 +51,9 @@ func (logdlog *Log) close() {
 func (logdlog *Log) append(logValue []byte) int64 {
 	var logEntry []byte
 	// get size of object in Bytes
-	v := int64(unsafe.Sizeof(logValue))
+	v := uint64(len(logValue))
 	logValueLength := make([]byte, binary.MaxVarintLen64)
-	binary.PutVarint(logValueLength, v)
+	binary.BigEndian.PutUint64(logValueLength, v)
 	// add size and value to the entry
 	for _, logValuePart := range logValue {
 		logEntry = append(logEntry, logValuePart)
@@ -72,7 +71,7 @@ func (logdlog *Log) append(logValue []byte) int64 {
 		log.Fatal(err)
 	}
 	offset := fileInfo.Size()
-	log.Println(fmt.Sprintf(`msg="New Log entry" size="%d" offset="%x"`, v, offset))
+	log.Println(fmt.Sprintf(`msg="New Log entry" size="%d" offset="%d"`, v, offset))
 	logdlog.LastOffset = offset
 	return offset
 }
@@ -81,11 +80,19 @@ func (logdlog *Log) get(offset ...int64) []byte {
 	if len(offset) == 0 {
 		offset[0] = logdlog.LastOffset
 	}
-	lengthFieldValue := make([]byte, binary.MaxVarintLen64)
-	logdlog.File.ReadAt(lengthFieldValue, offset[0])
-	lengthFieldValueInt, _ := binary.Varint(lengthFieldValue)
-	returnValue := make([]byte, lengthFieldValueInt)
-	logdlog.File.ReadAt(returnValue, offset[0]+lengthFieldValueInt)
-	log.Println(fmt.Sprintf(`msg="Log Read" size="%d" offset="%x"`, lengthFieldValueInt, offset))
+	lengthFieldValue := make(
+		[]byte,
+		binary.MaxVarintLen64)
+	logdlog.File.ReadAt(
+		lengthFieldValue,
+		(offset[0] - binary.MaxVarintLen64))
+	lengthFieldValueInt := binary.BigEndian.Uint64(lengthFieldValue)
+	returnValue := make(
+		[]byte,
+		lengthFieldValueInt)
+	logdlog.File.ReadAt(
+		returnValue,
+		(offset[0] - (binary.MaxVarintLen64 + int64(lengthFieldValueInt))))
+	log.Println(fmt.Sprintf(`msg="Log Read" size="%d" offset="%d"`, lengthFieldValueInt, offset[0]))
 	return returnValue
 }

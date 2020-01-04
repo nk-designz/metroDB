@@ -22,13 +22,15 @@ const (
 			`
 )
 
-type LogStore struct {
+type Log struct {
 	File       *os.File
 	LastOffset []byte
+	banner     string
 }
 
-func (logd *LogStore) open() {
-	fmt.Println(banner)
+func (logdlog *Log) open() {
+	logdlog.banner = banner
+	fmt.Println(logdlog.banner)
 	log.Println(`msg="initializing logger deamon..."`)
 	// Add Logger File to Logd
 	file, err := os.OpenFile(
@@ -38,16 +40,16 @@ func (logd *LogStore) open() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	logd.File = file
-	log.Println(fmt.Sprintf(`msg="Logging to File: %s"`, logd.File.Name()))
+	logdlog.File = file
+	log.Println(fmt.Sprintf(`msg="Logging to File: %s"`, logdlog.File.Name()))
 }
 
-func (logd *LogStore) close() {
+func (logdlog *Log) close() {
 	log.Println(`msg="shutting down logger deamon..."`)
-	defer logd.File.Close()
+	defer logdlog.File.Close()
 }
 
-func (logd *LogStore) append(logValue []byte) []byte {
+func (logdlog *Log) append(logValue []byte) []byte {
 	var logEntry []byte
 	// get size of object in Bytes
 	v := int64(unsafe.Sizeof(logValue))
@@ -62,25 +64,25 @@ func (logd *LogStore) append(logValue []byte) []byte {
 		logEntry = append(logEntry, logValueLengthPart)
 	}
 	// append the data to logfile
-	offsetvalue, err := logd.File.Write(logEntry)
+	offsetvalue, err := logdlog.File.Write(logEntry)
 	if err != nil {
 		log.Fatal(err)
 	}
-	lastOffset, _ := binary.Varint(logd.LastOffset)
+	lastOffset, _ := binary.Varint(logdlog.LastOffset)
 	offset := make([]byte, binary.MaxVarintLen64)
 	binary.PutVarint(offset, int64(lastOffset)+int64(offsetvalue))
-	logd.LastOffset = offset
+	logdlog.LastOffset = offset
 	log.Println(fmt.Sprintf(`msg="New Log entry" size="%d" offset="%x"`, v, offset))
 	return offset
 }
 
-func (logd *LogStore) get(offset []byte) []byte {
+func (logdlog *Log) get(offset []byte) []byte {
 	offsetInt, _ := binary.Varint(offset)
 	lengthFieldValue := make([]byte, binary.MaxVarintLen64)
-	logd.File.ReadAt(lengthFieldValue, offsetInt)
+	logdlog.File.ReadAt(lengthFieldValue, offsetInt)
 	lengthFieldValueInt, _ := binary.Varint(lengthFieldValue)
 	returnValue := make([]byte, lengthFieldValueInt)
-	logd.File.ReadAt(returnValue, offsetInt+lengthFieldValueInt)
+	logdlog.File.ReadAt(returnValue, offsetInt+lengthFieldValueInt)
 	log.Println(fmt.Sprintf(`msg="Log Read" size="%d" offset="%x"`, lengthFieldValueInt, offset))
 	return returnValue
 }

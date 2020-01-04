@@ -12,31 +12,31 @@ import (
 )
 
 type LogdServer struct {
-	LogStore *logd.LogStore
+	Log *logd.LogStore
 }
 
 func newLogdServer() pb.LogdServer {
 	logdServer := new(LogdServer)
-	logdServer.LogStore := new(logd.LogStore)
-	logdServer.LogStore.open()
+	logdServer.Log = new(logd.LogStore)
+	logdServer.Log.open()
 	return logdServer
 }
 
-func (s *LogdServer) Append(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
+func (server *LogdServer) Append(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
 	reply := new(pb.LogdReply)
-	reply.Data = s.LogStore.append(request.Data)
+	reply.Data = server.Log.append(request.Data)
 	return reply, nil
 }
 
-func (s *LogdServer) ReadEntryAt(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
+func (server *LogdServer) ReadEntryAt(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
 	reply := new(pb.LogdReply)
-	reply.Data = s.LogStore.get(request.Data)
+	reply.Data = server.Log.get(request.Data)
 	return reply, nil
 }
 
-func (s *LogdServer) ReadEntryLast(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
+func (server *LogdServer) ReadEntryLast(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
 	reply := new(pb.LogdReply)
-	reply.Data = s.LogStore.get(s.LogStore.LastOffset)
+	reply.Data = server.Log.get(s.LogStore.LastOffset)
 	return reply, nil
 }
 

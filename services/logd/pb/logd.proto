@@ -3,15 +3,22 @@ option go_package = "logd";
 package logd;
 
 service Logd {
-    rpc append (LogdRequest) returns (LogdReply) {}
-    rpc readEntryAt (LogdRequest) returns (LogdReply) {}
-    rpc readEntryLast (LogdRequest) returns (LogdReply) {}
+    rpc append (SetRequest) returns (SetReply) {}
+    rpc get (GetRequest) returns (GetReply) {}
 }
 
-message LogdRequest {
-    bytes data = 1;
+message GetRequest {
+    int64 offset = 1;
 }
 
-message LogdReply {
-    bytes data = 1;
+message SetRequest {
+    bytes entry = 1;
+}
+
+message GetReply {
+    int64 offset = 1;
+}
+
+message SetReply {
+    bytes entry = 1;
 }

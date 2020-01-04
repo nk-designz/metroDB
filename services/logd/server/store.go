@@ -24,7 +24,7 @@ const (
 
 type Log struct {
 	File       *os.File
-	LastOffset []byte
+	LastOffset int64
 	banner     string
 }
 
@@ -49,13 +49,12 @@ func (logdlog *Log) close() {
 	defer logdlog.File.Close()
 }
 
-func (logdlog *Log) append(logValue []byte) []byte {
+func (logdlog *Log) append(logValue []byte) int64 {
 	var logEntry []byte
 	// get size of object in Bytes
 	v := int64(unsafe.Sizeof(logValue))
 	logValueLength := make([]byte, binary.MaxVarintLen64)
 	binary.PutVarint(logValueLength, v)
-
 	// add size and value to the entry
 	for _, logValuePart := range logValue {
 		logEntry = append(logEntry, logValuePart)
@@ -64,25 +63,29 @@ func (logdlog *Log) append(logValue []byte) []byte {
 		logEntry = append(logEntry, logValueLengthPart)
 	}
 	// append the data to logfile
-	offsetvalue, err := logdlog.File.Write(logEntry)
+	_, err := logdlog.File.Write(logEntry)
 	if err != nil {
 		log.Fatal(err)
 	}
-	lastOffset, _ := binary.Varint(logdlog.LastOffset)
-	offset := make([]byte, binary.MaxVarintLen64)
-	binary.PutVarint(offset, int64(lastOffset)+int64(offsetvalue))
-	logdlog.LastOffset = offset
+	fileInfo, err := logdlog.File.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+	offset := fileInfo.Size()
 	log.Println(fmt.Sprintf(`msg="New Log entry" size="%d" offset="%x"`, v, offset))
+	logdlog.LastOffset = offset
 	return offset
 }
 
-func (logdlog *Log) get(offset []byte) []byte {
-	offsetInt, _ := binary.Varint(offset)
+func (logdlog *Log) get(offset ...int64) []byte {
+	if len(offset) == 0 {
+		offset[0] = logdlog.LastOffset
+	}
 	lengthFieldValue := make([]byte, binary.MaxVarintLen64)
-	logdlog.File.ReadAt(lengthFieldValue, offsetInt)
+	logdlog.File.ReadAt(lengthFieldValue, offset[0])
 	lengthFieldValueInt, _ := binary.Varint(lengthFieldValue)
 	returnValue := make([]byte, lengthFieldValueInt)
-	logdlog.File.ReadAt(returnValue, offsetInt+lengthFieldValueInt)
+	logdlog.File.ReadAt(returnValue, offset[0]+lengthFieldValueInt)
 	log.Println(fmt.Sprintf(`msg="Log Read" size="%d" offset="%x"`, lengthFieldValueInt, offset))
 	return returnValue
 }

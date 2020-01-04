@@ -1,4 +1,6 @@
 syntax = "proto3";
+option go_package = "logd";
+package logd;
 
 service Logd {
     rpc append (LogdRequest) returns (LogdReply) {}

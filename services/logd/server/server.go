@@ -1,24 +1,49 @@
 package logd
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
 
-	pb "../pb"
+	pb "github.com/nk-designz/metroDB/services/logd/pb"
 	"google.golang.org/grpc"
 )
 
+type LogdServer struct {
+	LogStore *LogStore
+}
+
+func newLogdServer() pb.LogdServer {
+	logdServer := new(LogdServer)
+	logdServer.LogStore.open()
+	return logdServer
+}
+
+func (s *LogdServer) Append(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
+	reply := new(pb.LogdReply)
+	reply.Data = s.LogStore.append(request.Data)
+	return reply, nil
+}
+
+func (s *LogdServer) ReadEntryAt(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
+	reply := new(pb.LogdReply)
+	reply.Data = s.LogStore.get(request.Data)
+	return reply, nil
+}
+
+func (s *LogdServer) ReadlastEntry(ctx context.Context, request *pb.LogdRequest) (*pb.LogdReply, error) {
+	reply := new(pb.LogdReply)
+	reply.Data = s.LogStore.get(s.LogStore.LastOffset)
+	return reply, nil
+}
+
 func main() {
-	store := new(LogStore)
-	store.open()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 70558))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-
-	pb.RegisterRouteGuideServer(grpcServer, &routeGuideServer{})
+	pb.RegisterLogdServer(grpcServer, &LogdServer{})
 	grpcServer.Serve(lis)
-	store.close()
 }

@@ -4,8 +4,12 @@
 package logd
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -99,21 +103,174 @@ func (m *LogdReply) GetData() []byte {
 }
 
 func init() {
-	proto.RegisterType((*LogdRequest)(nil), "LogdRequest")
-	proto.RegisterType((*LogdReply)(nil), "LogdReply")
+	proto.RegisterType((*LogdRequest)(nil), "logd.LogdRequest")
+	proto.RegisterType((*LogdReply)(nil), "logd.LogdReply")
 }
 
 func init() { proto.RegisterFile("logd.proto", fileDescriptor_b597ae122605a96b) }
 
 var fileDescriptor_b597ae122605a96b = []byte{
-	// 141 bytes of a gzipped FileDescriptorProto
+	// 155 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xca, 0xc9, 0x4f, 0x4f,
-	0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0x52, 0xe4, 0xe2, 0xf6, 0xc9, 0x4f, 0x4f, 0x09, 0x4a,
-	0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0x12, 0xe2, 0x62, 0x49, 0x49, 0x2c, 0x49, 0x94, 0x60, 0x54,
-	0x60, 0xd4, 0xe0, 0x09, 0x02, 0xb3, 0x95, 0xe4, 0xb9, 0x38, 0x21, 0x4a, 0x0a, 0x72, 0x2a, 0xb1,
-	0x29, 0x30, 0x6a, 0x61, 0xe4, 0x62, 0x01, 0xa9, 0x10, 0x52, 0xe1, 0x62, 0x4b, 0x2c, 0x28, 0x48,
-	0xcd, 0x4b, 0x11, 0xe2, 0xd1, 0x43, 0x32, 0x55, 0x8a, 0x4b, 0x0f, 0x6e, 0x80, 0x12, 0x83, 0x90,
-	0x26, 0x17, 0x77, 0x51, 0x6a, 0x62, 0x8a, 0x6b, 0x5e, 0x49, 0x51, 0xa5, 0x63, 0x09, 0x5e, 0xa5,
-	0xda, 0x5c, 0xbc, 0x70, 0xa5, 0x3e, 0x89, 0xc5, 0x78, 0x15, 0x27, 0xb1, 0x81, 0x7d, 0x64, 0x0c,
-	0x08, 0x00, 0x00, 0xff, 0xff, 0xa0, 0x1b, 0x1b, 0xfa, 0xdf, 0x00, 0x00, 0x00,
+	0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x01, 0xb1, 0x95, 0x14, 0xb9, 0xb8, 0x7d, 0xf2,
+	0xd3, 0x53, 0x82, 0x52, 0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0x84, 0x84, 0xb8, 0x58, 0x52, 0x12, 0x4b,
+	0x12, 0x25, 0x18, 0x15, 0x18, 0x35, 0x78, 0x82, 0xc0, 0x6c, 0x25, 0x79, 0x2e, 0x4e, 0x88, 0x92,
+	0x82, 0x9c, 0x4a, 0x6c, 0x0a, 0x8c, 0x16, 0x31, 0x72, 0xb1, 0x80, 0x54, 0x08, 0xe9, 0x71, 0xb1,
+	0x25, 0x16, 0x14, 0xa4, 0xe6, 0xa5, 0x08, 0x09, 0xea, 0x81, 0x6d, 0x42, 0x32, 0x5a, 0x8a, 0x1f,
+	0x59, 0xa8, 0x20, 0xa7, 0x52, 0x89, 0x41, 0xc8, 0x98, 0x8b, 0xbb, 0x28, 0x35, 0x31, 0xc5, 0x35,
+	0xaf, 0xa4, 0xa8, 0xd2, 0xb1, 0x84, 0x48, 0x4d, 0xa6, 0x5c, 0xbc, 0x70, 0x4d, 0x3e, 0x89, 0xc5,
+	0x44, 0x6a, 0x73, 0x62, 0x8b, 0x02, 0x7b, 0x38, 0x89, 0x0d, 0xec, 0x7b, 0x63, 0x40, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0x03, 0xef, 0x4b, 0x6f, 0x0b, 0x01, 0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// LogdClient is the client API for Logd service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type LogdClient interface {
+	Append(ctx context.Context, in *LogdRequest, opts ...grpc.CallOption) (*LogdReply, error)
+	ReadEntryAt(ctx context.Context, in *LogdRequest, opts ...grpc.CallOption) (*LogdReply, error)
+	ReadEntryLast(ctx context.Context, in *LogdRequest, opts ...grpc.CallOption) (*LogdReply, error)
+}
+
+type logdClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewLogdClient(cc *grpc.ClientConn) LogdClient {
+	return &logdClient{cc}
+}
+
+func (c *logdClient) Append(ctx context.Context, in *LogdRequest, opts ...grpc.CallOption) (*LogdReply, error) {
+	out := new(LogdReply)
+	err := c.cc.Invoke(ctx, "/logd.Logd/append", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *logdClient) ReadEntryAt(ctx context.Context, in *LogdRequest, opts ...grpc.CallOption) (*LogdReply, error) {
+	out := new(LogdReply)
+	err := c.cc.Invoke(ctx, "/logd.Logd/readEntryAt", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *logdClient) ReadEntryLast(ctx context.Context, in *LogdRequest, opts ...grpc.CallOption) (*LogdReply, error) {
+	out := new(LogdReply)
+	err := c.cc.Invoke(ctx, "/logd.Logd/readEntryLast", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// LogdServer is the server API for Logd service.
+type LogdServer interface {
+	Append(context.Context, *LogdRequest) (*LogdReply, error)
+	ReadEntryAt(context.Context, *LogdRequest) (*LogdReply, error)
+	ReadEntryLast(context.Context, *LogdRequest) (*LogdReply, error)
+}
+
+// UnimplementedLogdServer can be embedded to have forward compatible implementations.
+type UnimplementedLogdServer struct {
+}
+
+func (*UnimplementedLogdServer) Append(ctx context.Context, req *LogdRequest) (*LogdReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Append not implemented")
+}
+func (*UnimplementedLogdServer) ReadEntryAt(ctx context.Context, req *LogdRequest) (*LogdReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadEntryAt not implemented")
+}
+func (*UnimplementedLogdServer) ReadEntryLast(ctx context.Context, req *LogdRequest) (*LogdReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadEntryLast not implemented")
+}
+
+func RegisterLogdServer(s *grpc.Server, srv LogdServer) {
+	s.RegisterService(&_Logd_serviceDesc, srv)
+}
+
+func _Logd_Append_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogdServer).Append(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/logd.Logd/Append",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogdServer).Append(ctx, req.(*LogdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Logd_ReadEntryAt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogdServer).ReadEntryAt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/logd.Logd/ReadEntryAt",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogdServer).ReadEntryAt(ctx, req.(*LogdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Logd_ReadEntryLast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogdServer).ReadEntryLast(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/logd.Logd/ReadEntryLast",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogdServer).ReadEntryLast(ctx, req.(*LogdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Logd_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "logd.Logd",
+	HandlerType: (*LogdServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "append",
+			Handler:    _Logd_Append_Handler,
+		},
+		{
+			MethodName: "readEntryAt",
+			Handler:    _Logd_ReadEntryAt_Handler,
+		},
+		{
+			MethodName: "readEntryLast",
+			Handler:    _Logd_ReadEntryLast_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "logd.proto",
 }

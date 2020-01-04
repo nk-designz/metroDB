@@ -39,7 +39,7 @@ func (newInstance *Logd) Append(entry []byte) int64 {
 func (newInstance *Logd) Get(offset ...int64) []byte {
 	var entry *pb.GetReply
 	var err error
-	if len(offset) == 0 {
+	if(len(offset) == 0) {
 		entry, err = newInstance.client.Get(context.Background(), &pb.GetRequest{})
 	} else {
 		entry, err = newInstance.client.Get(context.Background(), &pb.GetRequest{Offset: offset[0]})

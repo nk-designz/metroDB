@@ -55,12 +55,8 @@ func (logdlog *Log) append(logValue []byte) int64 {
 	logValueLength := make([]byte, binary.MaxVarintLen64)
 	binary.BigEndian.PutUint64(logValueLength, v)
 	// add size and value to the entry
-	for _, logValuePart := range logValue {
-		logEntry = append(logEntry, logValuePart)
-	}
-	for _, logValueLengthPart := range logValueLength {
-		logEntry = append(logEntry, logValueLengthPart)
-	}
+	logEntry = append(logEntry, logValue...)
+	logEntry = append(logEntry, logValueLength...)
 	// append the data to logfile
 	_, err := logdlog.File.Write(logEntry)
 	if err != nil {

@@ -6,9 +6,22 @@ FROM golang:latest AS mond-builder
 RUN go get "github.com/nk-designz/metrodb/services/mond"
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o /bin/mond /go/src/github.com/nk-designz/metroDB/services/mond
 
+FROM golang:latest AS mapd-builder
+RUN go get "github.com/nk-designz/metrodb/services/mapd"
+RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o /bin/mapd /go/src/github.com/nk-designz/metroDB/services/mapd
+
 FROM alpine
+# FROM quay.io/redhat/ubi-8 
+
+# Install logd
 COPY --from=logd-builder /bin/logd /bin/logd
-COPY --from=mond-builder /bin/mond /bin/mond
-RUN mkdir /opt/logd
+RUN mkdir /var/metrodb/logd
+ENV LOGD_DB_PATH=/opt/metrodb/logd
 EXPOSE 7558
-ENV LOGD_DB_PATH=/opt/logd-server
+# Install mond
+COPY --from=mond-builder /bin/mond /bin/mond
+# Install mapd
+COPY --from=mapd-builder /bin/mapd /bin/mapd
+RUN mkdir /var/metrodb/mapd
+ENV MAPD_DB_PATH=/opt/metrodb/mapd
+EXPOSE 7550

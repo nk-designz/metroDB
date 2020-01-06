@@ -12,7 +12,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o /bi
 RUN go get "github.com/nk-designz/metrodb/services/mapd/cmd"
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o /bin/mapd-util /go/src/github.com/nk-designz/metroDB/services/mapd/cmd
 
-FROM alpine
+FROM registry.redhat.io/ubi8/ubi-minimal:latest
 RUN mkdir /var/metrodb
 # Install logd
 COPY --from=logd-builder /bin/logd /bin/logd

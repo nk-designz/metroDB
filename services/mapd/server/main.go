@@ -140,7 +140,7 @@ type MapdServer struct {
 	mapd *Mapd
 }
 
-func (server *MapdServer) set(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
+func (server *MapdServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
 	reply := new(pb.SetReply)
 	reply.Err = func() bool {
 		server.mapd.set(request.Key, request.Value)
@@ -160,7 +160,7 @@ func (server *MapdServer) set(ctx context.Context, request *pb.SetRequest) (*pb.
 	return reply, nil
 }
 
-func (server *MapdServer) setSafe(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
+func (server *MapdServer) SetSafe(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
 	reply := new(pb.SetReply)
 	reply.Err = func() bool {
 		server.mapd.setSafe(request.Key, request.Value)
@@ -180,13 +180,13 @@ func (server *MapdServer) setSafe(ctx context.Context, request *pb.SetRequest) (
 	return reply, nil
 }
 
-func (server *MapdServer) get(ctx context.Context, request *pb.GetRequest) (*pb.GetReply, error) {
+func (server *MapdServer) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetReply, error) {
 	reply := new(pb.GetReply)
 	reply.Value = server.mapd.get(request.Key)
 	return reply, nil
 }
 
-func (mapdServer *MapdServer) newMapdServer() *MapdServer {
+func newMapdServer() *MapdServer {
 	mapdServerInstance := new(MapdServer)
 	mapdServerInstance.mapd = new(Mapd)
 	err := mapdServerInstance.mapd.init()
@@ -203,6 +203,6 @@ func main() {
 	}
 	log.Println(fmt.Sprintf(`msg="Running server" port="%d"`, PORT))
 	grpcServer := grpc.NewServer()
-	pb.RegistermapdServer(grpcServer, newMapdServer())
+	pb.RegisterMapdServer(grpcServer, newMapdServer())
 	grpcServer.Serve(lis)
 }

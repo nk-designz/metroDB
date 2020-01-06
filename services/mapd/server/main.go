@@ -97,6 +97,7 @@ func (mapd *Mapd) retrivePersistentIndex() error {
 	var memoryIndex map[string][]Replica
 	var buffer []byte
 
+	log.Println(`msg="retrieving map from disk..."`)
 	bufferReader := new(bytes.Buffer)
 	mapd.index.disk.Read(buffer)
 	bufferReader.Read(buffer)

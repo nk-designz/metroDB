@@ -125,6 +125,7 @@ func (mapd *Mapd) set(key string, value []byte) {
 			offset:   offset,
 			logStore: logdIndex}}
 	go mapd.updatePersistentIndex()
+	log.Println(`msg="set new key"`, key, len(value))
 }
 
 func (mapd *Mapd) setSafe(key string, value []byte) {
@@ -138,6 +139,7 @@ func (mapd *Mapd) get(key string) []byte {
 	offset := entry[0].offset
 	logd.Connect()
 	defer logd.Close()
+	log.Println(`msg="get key"`, key)
 	return logd.Get(offset)
 
 }
@@ -148,21 +150,9 @@ type MapdServer struct {
 
 func (server *MapdServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
 	reply := new(pb.SetReply)
-	reply.Err = func() bool {
-		server.mapd.set(request.Key, request.Value)
-		errChan := make(chan bool)
-		defer func(errChan chan bool) {
-			r := recover()
-			if r != nil {
-				errChan <- false
-			} else {
-				errChan <- true
-			}
-		}(errChan)
-		rbool := <-errChan
-		close(errChan)
-		return rbool
-	}()
+	// TODO: Error handling on Panic
+	server.mapd.set(request.Key, request.Value)
+	reply.Err = false
 	return reply, nil
 }
 

@@ -10,7 +10,7 @@ import (
 func main() {
 	address := os.Args[1]
 	mapdInstance := mapd.New(address)
-	if os.Args[2] == "set" && os.Args[5] == "safe" {
+	if os.Args[2] == "setsafe" {
 		mapdInstance.SetSafe(
 			os.Args[3],
 			[]byte(os.Args[4]))
@@ -21,7 +21,8 @@ func main() {
 			[]byte(os.Args[4]))
 		fmt.Println("Seems ok")
 	} else if os.Args[2] == "get" {
-		fmt.Println(mapdInstance.Get(os.Args[3]))
+		byteval, _ := mapdInstance.Get(os.Args[3])
+		fmt.Println(fmt.Sprintf("%s", byteval))
 	} else {
 		fmt.Println("No valid command")
 	}

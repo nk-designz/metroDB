@@ -17,7 +17,8 @@ type Mapd struct {
 
 func New(address string) *Mapd {
 	mapdInstance := new(Mapd)
-	mapdInstance.address = address
+	mapdInstance.address = fmt.Sprintf("%s:7550", address)
+	mapdInstance.Connect()
 	return mapdInstance
 }
 

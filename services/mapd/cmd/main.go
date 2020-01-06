@@ -10,8 +10,8 @@ import (
 func main() {
 	address := os.Args[1]
 	mapd := mapd.New(address)
-	if (os.Args[2] == "set" && os.Args[5] == "safe") {
-		mapd.SafeSet(os.Args[3], []byte(os.Args[4]))
+	if os.Args[2] == "set" && os.Args[5] == "safe" {
+		mapd.setSafe(os.Args[3], []byte(os.Args[4]))
 		fmt.Println("Seems ok")
 	} else if os.Args[2] == "set" {
 		mapd.Set(os.Args[3], []byte(os.Args[4]))

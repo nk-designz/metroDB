@@ -1,5 +1,5 @@
 # MetroDB
-![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/nicokahlert/metrodb?style=flat-square)
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/nicokahlert/metrodb?style=flat-square)  
 A distributed Key-Value-Store for transaction-safety inspired by blockchain-technology.
 # Components
 ## logd

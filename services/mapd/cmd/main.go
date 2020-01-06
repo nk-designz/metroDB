@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	mapd "github.com/nk-designz/metroDB/services/mapd/client"
@@ -19,6 +20,16 @@ func main() {
 		mapdInstance.Set(
 			os.Args[3],
 			[]byte(os.Args[4]))
+		fmt.Println("Seems ok")
+	} else if os.Args[2] == "setfromfile" {
+		fileContent, err := ioutil.ReadFile(os.Args[4])
+		if err != nil {
+			fmt.Println("Could not open file")
+			panic(err)
+		}
+		mapdInstance.Set(
+			os.Args[3],
+			fileContent)
 		fmt.Println("Seems ok")
 	} else if os.Args[2] == "get" {
 		byteval, _ := mapdInstance.Get(os.Args[3])

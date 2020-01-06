@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mond
+spec:
+  selector:
+    matchLabels:
+      app: mond
+  template:
+    metadata:
+      labels:
+        app: mond
+    spec:
+      containers:
+      - name: mond
+        image: nicokahlert/metrodb
+        command: ["/bin/mond"]
+        args: ["metrodb-monds-0","metrodb-monds-1","metrodb-monds-2"]
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

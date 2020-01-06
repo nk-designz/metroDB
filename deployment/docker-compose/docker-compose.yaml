@@ -1,0 +1,41 @@
+version: '3'
+services:
+  logd1:
+    image: nicokahlert/metrodb
+    environment: 
+      LOGD_DB_PATH: /var/metrodb/logd
+    command: '/bin/logd'
+    volumes: 
+      - logd1:/var/metrodb/logd
+  logd2:
+    image: nicokahlert/metrodb
+    environment: 
+      LOGD_DB_PATH: /var/metrodb/logd
+    command: '/bin/logd'
+    volumes: 
+      - logd2:/var/metrodb/logd
+  logd3:
+    image: nicokahlert/metrodb
+    environment: 
+      LOGD_DB_PATH: /var/metrodb/logd
+    command: '/bin/logd'
+    volumes: 
+      - logd3:/var/metrodb/logd
+  mapd:
+    image: nicokahlert/metrodb
+    ports: 
+    - "7550:7550"
+    environment: 
+      MAPD_INDEX_PATH: /var/metrodb/mapd
+    command: '/bin/mapd logd1 logd2 logd3'
+    volumes: 
+      - mapd:/var/metrodb/mapd
+    depends_on: 
+      - logd1
+      - logd2
+      - logd3
+volumes: 
+  mapd:
+  logd1:
+  logd2:
+  logd3:

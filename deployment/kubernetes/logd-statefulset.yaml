@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: logds-metrodb
+specs:
+  selector:
+    matchLabels:
+      app: logds-metrodb
+    serviceName: "logds-metrodb"
+    replicas: 3
+    template:
+      metadata:
+        labels:
+          app: logds-metrodb
+      spec:
+        terminationGracePeriodSeconds: 30
+        containers:
+        - name: logd 
+          image: nicokahlert/metrodb
+          env:
+          - name: LOGD_DB_PATH
+            value: "/var/metrodb/logd"
+          command: ["/bin/logd"]
+          ports:
+          - containerPort: 7558
+            name: logd-grpc
+          resources:
+            limits:
+              memory: "128Gi"
+              cpu: "500m"
+            requests:
+              memory: "100Mi"
+              cpu: "50m"
+          volumeMounts:
+          - name: persistent-log
+            mountPath: /var/metrodb/logd
+    volumeClaimTemplates:
+    - metadata:
+        name: persistent-log
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi

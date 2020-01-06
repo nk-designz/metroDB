@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrodb
+spec:
+  selector:
+    app: metrodb-mapds
+  ports:
+  - name: metrodb-grpc
+    port: 7550
+    targetPort: 7550
+    protocol: TCP

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mapds-metrodb
+specs:
+  selector:
+    matchLabels:
+      app: mapds-metrodb
+    serviceName: "mapds-metrodb"
+    replicas: 3
+    template:
+      metadata:
+        labels:
+          app: mapds-metrodb
+      spec:
+        terminationGracePeriodSeconds: 30
+        containers:
+        - name: logd 
+          image: nicokahlert/metrodb
+          env:
+          - name: MAPD_INDEX_PATH
+            value: "/var/metrodb/mapd"
+          command: ["/bin/mapd"]
+          args: ["metrodb-logds-0","metrodb-logds-1","metrodb-logds-2"]
+          ports:
+          - containerPort: 7558
+            name: mapd-grpc
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+            requests:
+              memory: "100Mi"
+              cpu: "50m"
+          volumeMounts:
+          - name: persistent-index
+            mountPath: /var/metrodb/logd
+    volumeClaimTemplates:
+    - metadata:
+        name: persistent-index
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi

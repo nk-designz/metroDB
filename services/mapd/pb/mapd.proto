@@ -1,0 +1,26 @@
+syntax = "proto3";
+option go_package = "mapd";
+package mapd;
+
+service Mapd {
+    rpc set (SetRequest) returns (SetReply) {}
+    rpc setSafe (SetRequest) returns (SetReply) {}
+    rpc get (GetRequest) returns (GetReply) {}
+}
+
+message GetRequest {
+    string key = 1;
+}
+
+message SetRequest {
+    string key = 1;
+    bytes  value = 2;
+}
+
+message GetReply {
+    bytes value = 1;
+}
+
+message SetReply {
+    bool err = 1;
+}

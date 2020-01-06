@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 const (
@@ -19,12 +20,35 @@ const (
 	_________________________________________
 	by metroDB 2020
 			`
+	defaultSyncSchedule = 10
 )
 
 type Log struct {
 	File       *os.File
 	LastOffset int64
 	banner     string
+	sync struct {
+		ticker	*time.Ticker
+		quit	chan struct{}
+	}
+}
+
+func (logdlog *Log) sheduleDiskSync() {
+	logdlog.sync.ticker = time.NewTicker(defaultSyncSchedule * time.Second)
+	logdlog.sync.quit = make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-logdlog.sync.ticker.C:
+				log.Println(`msg="Syncing log to disk"`)
+				logdlog.File.Sync()
+			case <-logdlog.sync.quit:
+				log.Println(`msg="stopping disk sync"`)
+				logdlog.sync.ticker.Stop()
+				return
+			}
+		}
+	}()
 }
 
 func (logdlog *Log) open() {
@@ -40,11 +64,13 @@ func (logdlog *Log) open() {
 		log.Fatal(err)
 	}
 	logdlog.File = file
+	logdlog.sheduleDiskSync()
 	log.Println(fmt.Sprintf(`msg="Logging to File: %s"`, logdlog.File.Name()))
 }
 
 func (logdlog *Log) close() {
 	log.Println(`msg="shutting down logger deamon..."`)
+	close(logdlog.sync.quit)
 	defer logdlog.File.Close()
 }
 

@@ -7,8 +7,13 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"time"
 
 	logd "github.com/nk-designz/metroDB/services/logd/client"
+)
+
+const (
+	defaultSyncSchedule = 10
 )
 
 type Replica struct {
@@ -20,13 +25,18 @@ type Mapd struct {
 	index struct {
 		memory map[string][]Replica
 		disk   *os.File
+		sync   struct {
+			ticker *time.Ticker
+			quit   chan struct{}
+		}
 	}
-	logds map[int]*logd.Logd
+	logds []*logd.Logd
 }
 
 func (mapd *Mapd) init() error {
 	log.Println(`msg="initializing map deamon..."`)
 	// Add Logger File to Logd
+	mapd.logds = make([]*logd.Logd, len(os.Args))
 	file, err := os.OpenFile(
 		fmt.Sprintf("%smapd.db", os.Getenv("MAPD_INDEX_PATH")),
 		os.O_CREATE|os.O_RDWR|os.O_APPEND,
@@ -34,13 +44,40 @@ func (mapd *Mapd) init() error {
 	mapd.index.disk = file
 	log.Println(fmt.Sprintf(`msg="Persisting to File: %s"`, mapd.index.disk.Name()))
 	err = mapd.retrivePersistentIndex()
-	mapd.logds[0] = logd.New("127.0.0.1")
+	if err != nil {
+		mapd.index.memory = map[string][]Replica{}
+		err = nil
+	}
+	for i, v := range os.Args {
+		if i > 0 {
+			mapd.logds[i-1] = logd.New(v)
+		}
+	}
 	return err
 }
 
 func (mapd *Mapd) close() {
 	log.Println(`msg="shutting down map deamon..."`)
+	close(mapd.index.sync.quit)
 	mapd.index.disk.Close()
+}
+
+func (mapd *Mapd) sheduleDiskSync() {
+	mapd.index.sync.ticker = time.NewTicker(defaultSyncSchedule * time.Second)
+	mapd.index.sync.quit = make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-mapd.index.sync.ticker.C:
+				log.Println(`msg="Syncing log to disk"`)
+				mapd.index.disk.Sync()
+			case <-mapd.index.sync.quit:
+				log.Println(`msg="stopping disk sync"`)
+				mapd.index.sync.ticker.Stop()
+				return
+			}
+		}
+	}()
 }
 
 func (mapd *Mapd) updatePersistentIndex() error {
@@ -61,7 +98,7 @@ func (mapd *Mapd) retrivePersistentIndex() error {
 	decoder := gob.NewDecoder(bufferReader)
 	err := decoder.Decode(&memoryIndex)
 	mapd.index.memory = memoryIndex
-	return err
+	return errgit 
 }
 
 func (mapd *Mapd) set(key string, value []byte) {
@@ -100,5 +137,7 @@ func main() {
 		"1",
 		[]byte("test"))
 	fmt.Println(
-		mapd.get("1"))
+		fmt.Sprintf(
+			"%s",
+			mapd.get("1")))
 }

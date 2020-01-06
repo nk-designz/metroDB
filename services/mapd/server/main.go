@@ -53,6 +53,11 @@ func (mapd *Mapd) init() error {
 		mapd.index.memory = map[string][]Replica{}
 		err = nil
 	}
+	mapd.sheduleDiskSync()
+	for k, v := range mapd.index.memory {
+		log.Println(
+			fmt.Sprintf(`msg="found key-value-pair" key="%s" offset="%x" logstore="%d"`, k, v[0].offset, v[0].logStore))
+	}
 	for i, v := range os.Args {
 		if i > 0 {
 			mapd.logds[i-1] = logd.New(v)
@@ -74,7 +79,7 @@ func (mapd *Mapd) sheduleDiskSync() {
 		for {
 			select {
 			case <-mapd.index.sync.ticker.C:
-				log.Println(`msg="Syncing log to disk"`)
+				log.Println(`msg="Syncing map to disk"`)
 				mapd.index.disk.Sync()
 			case <-mapd.index.sync.quit:
 				log.Println(`msg="stopping disk sync"`)

@@ -9,15 +9,19 @@ import (
 
 func main() {
 	address := os.Args[1]
-	mapd := mapd.New(address)
+	mapdInstance := mapd.New(address)
 	if os.Args[2] == "set" && os.Args[5] == "safe" {
-		mapd.setSafe(os.Args[3], []byte(os.Args[4]))
+		mapdInstance.SetSafe(
+			os.Args[3],
+			[]byte(os.Args[4]))
 		fmt.Println("Seems ok")
 	} else if os.Args[2] == "set" {
-		mapd.Set(os.Args[3], []byte(os.Args[4]))
+		mapdInstance.Set(
+			os.Args[3],
+			[]byte(os.Args[4]))
 		fmt.Println("Seems ok")
 	} else if os.Args[2] == "get" {
-		fmt.Println(mapd.get(os.Args[3]))
+		fmt.Println(mapdInstance.Get(os.Args[3]))
 	} else {
 		fmt.Println("No valid command")
 	}

@@ -9,6 +9,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o /bi
 FROM golang:latest AS mapd-builder
 RUN go get "github.com/nk-designz/metrodb/services/mapd/server"
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o /bin/mapd /go/src/github.com/nk-designz/metroDB/services/mapd/server
+RUN go get "github.com/nk-designz/metrodb/services/mapd/cmd"
+RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o /bin/mapd-util /go/src/github.com/nk-designz/metroDB/services/mapd/cmd
 
 FROM alpine
 # FROM quay.io/redhat/ubi-8 
@@ -22,6 +24,7 @@ EXPOSE 7558
 COPY --from=mond-builder /bin/mond /bin/mond
 # Install mapd
 COPY --from=mapd-builder /bin/mapd /bin/mapd
+COPY --from=mapd-builder /bin/mapd-util /bin/mapd-util
 RUN mkdir /var/metrodb/mapd
 ENV MAPD_DB_PATH=/opt/metrodb/mapd
 EXPOSE 7550

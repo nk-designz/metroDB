@@ -31,17 +31,17 @@ func (mapd *Mapd) Connect() {
 	mapd.client = pb.NewMapdClient(mapd.connection)
 }
 
-func (mapd *Mapd) set(key string, value []byte) (bool, error) {
+func (mapd *Mapd) Set(key string, value []byte) (bool, error) {
 	t, err := mapd.client.Set(context.Background(), &pb.SetRequest{Key: key, Value: value})
 	return t.Err, err
 }
 
-func (mapd *Mapd) setSafe(key string, value []byte) (bool, error) {
+func (mapd *Mapd) SetSafe(key string, value []byte) (bool, error) {
 	t, err := mapd.client.SetSafe(context.Background(), &pb.SetRequest{Key: key, Value: value})
 	return t.Err, err
 }
 
-func (mapd *Mapd) get(key string) ([]byte, error) {
+func (mapd *Mapd) Get(key string) ([]byte, error) {
 	value, err := mapd.client.Get(context.Background(), &pb.GetRequest{Key: key})
 	if err != nil {
 		log.Println(

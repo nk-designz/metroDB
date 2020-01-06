@@ -4,8 +4,12 @@
 package mapd
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -208,4 +212,156 @@ var fileDescriptor_47c62a75174acd61 = []byte{
 	0x39, 0x1d, 0x61, 0xb2, 0x3b, 0x86, 0x52, 0x77, 0xb8, 0x52, 0x27, 0xb6, 0x28, 0x70, 0x58, 0x25,
 	0xb1, 0x81, 0x03, 0xce, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x69, 0x18, 0x20, 0x93, 0x46, 0x01,
 	0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// MapdClient is the client API for Mapd service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type MapdClient interface {
+	Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetReply, error)
+	SetSafe(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetReply, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetReply, error)
+}
+
+type mapdClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewMapdClient(cc *grpc.ClientConn) MapdClient {
+	return &mapdClient{cc}
+}
+
+func (c *mapdClient) Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetReply, error) {
+	out := new(SetReply)
+	err := c.cc.Invoke(ctx, "/mapd.Mapd/set", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mapdClient) SetSafe(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetReply, error) {
+	out := new(SetReply)
+	err := c.cc.Invoke(ctx, "/mapd.Mapd/setSafe", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mapdClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetReply, error) {
+	out := new(GetReply)
+	err := c.cc.Invoke(ctx, "/mapd.Mapd/get", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// MapdServer is the server API for Mapd service.
+type MapdServer interface {
+	Set(context.Context, *SetRequest) (*SetReply, error)
+	SetSafe(context.Context, *SetRequest) (*SetReply, error)
+	Get(context.Context, *GetRequest) (*GetReply, error)
+}
+
+// UnimplementedMapdServer can be embedded to have forward compatible implementations.
+type UnimplementedMapdServer struct {
+}
+
+func (*UnimplementedMapdServer) Set(ctx context.Context, req *SetRequest) (*SetReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
+}
+func (*UnimplementedMapdServer) SetSafe(ctx context.Context, req *SetRequest) (*SetReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetSafe not implemented")
+}
+func (*UnimplementedMapdServer) Get(ctx context.Context, req *GetRequest) (*GetReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+
+func RegisterMapdServer(s *grpc.Server, srv MapdServer) {
+	s.RegisterService(&_Mapd_serviceDesc, srv)
+}
+
+func _Mapd_Set_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MapdServer).Set(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mapd.Mapd/Set",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MapdServer).Set(ctx, req.(*SetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Mapd_SetSafe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MapdServer).SetSafe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mapd.Mapd/SetSafe",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MapdServer).SetSafe(ctx, req.(*SetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Mapd_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MapdServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mapd.Mapd/Get",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MapdServer).Get(ctx, req.(*GetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Mapd_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "mapd.Mapd",
+	HandlerType: (*MapdServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "set",
+			Handler:    _Mapd_Set_Handler,
+		},
+		{
+			MethodName: "setSafe",
+			Handler:    _Mapd_SetSafe_Handler,
+		},
+		{
+			MethodName: "get",
+			Handler:    _Mapd_Get_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "mapd.proto",
 }

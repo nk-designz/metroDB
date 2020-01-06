@@ -2,18 +2,23 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/gob"
 	"fmt"
 	"log"
 	"math/rand"
+	"net"
 	"os"
 	"time"
 
 	logd "github.com/nk-designz/metroDB/services/logd/client"
+	pb "github.com/nk-designz/metroDB/services/mapd/pb"
+	"google.golang.org/grpc"
 )
 
 const (
 	defaultSyncSchedule = 10
+	PORT                = 7550
 )
 
 type Replica struct {
@@ -98,7 +103,7 @@ func (mapd *Mapd) retrivePersistentIndex() error {
 	decoder := gob.NewDecoder(bufferReader)
 	err := decoder.Decode(&memoryIndex)
 	mapd.index.memory = memoryIndex
-	return errgit 
+	return err
 }
 
 func (mapd *Mapd) set(key string, value []byte) {
@@ -116,6 +121,11 @@ func (mapd *Mapd) set(key string, value []byte) {
 	go mapd.updatePersistentIndex()
 }
 
+func (mapd *Mapd) setSafe(key string, value []byte) {
+	mapd.set(key, value)
+	mapd.index.disk.Sync()
+}
+
 func (mapd *Mapd) get(key string) []byte {
 	entry := mapd.index.memory[key]
 	logd := mapd.logds[entry[0].logStore]
@@ -126,18 +136,73 @@ func (mapd *Mapd) get(key string) []byte {
 
 }
 
-func main() {
-	mapd := new(Mapd)
-	err := mapd.init()
-	defer mapd.close()
+type MapdServer struct {
+	mapd *Mapd
+}
+
+func (server *MapdServer) set(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
+	reply := new(pb.SetReply)
+	reply.Err = func() bool {
+		server.mapd.set(request.Key, request.Value)
+		errChan := make(chan bool)
+		defer func(errChan chan bool) {
+			r := recover()
+			if r != nil {
+				errChan <- false
+			} else {
+				errChan <- true
+			}
+		}(errChan)
+		rbool := <-errChan
+		close(errChan)
+		return rbool
+	}()
+	return reply, nil
+}
+
+func (server *MapdServer) setSafe(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
+	reply := new(pb.SetReply)
+	reply.Err = func() bool {
+		server.mapd.setSafe(request.Key, request.Value)
+		errChan := make(chan bool)
+		defer func(errChan chan bool) {
+			r := recover()
+			if r != nil {
+				errChan <- false
+			} else {
+				errChan <- true
+			}
+		}(errChan)
+		rbool := <-errChan
+		close(errChan)
+		return rbool
+	}()
+	return reply, nil
+}
+
+func (server *MapdServer) get(ctx context.Context, request *pb.GetRequest) (*pb.GetReply, error) {
+	reply := new(pb.GetReply)
+	reply.Value = server.mapd.get(request.Key)
+	return reply, nil
+}
+
+func (mapdServer *MapdServer) newMapdServer() *MapdServer {
+	mapdServerInstance := new(MapdServer)
+	mapdServerInstance.mapd = new(Mapd)
+	err := mapdServerInstance.mapd.init()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	mapd.set(
-		"1",
-		[]byte("test"))
-	fmt.Println(
-		fmt.Sprintf(
-			"%s",
-			mapd.get("1")))
+	return mapdServerInstance
+}
+
+func main() {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
+	if err != nil {
+		log.Fatalf(fmt.Sprintf(`msg="Failed running server" port="%d" error="%v"`, PORT, err))
+	}
+	log.Println(fmt.Sprintf(`msg="Running server" port="%d"`, PORT))
+	grpcServer := grpc.NewServer()
+	pb.RegistermapdServer(grpcServer, newMapdServer())
+	grpcServer.Serve(lis)
 }

@@ -21,7 +21,7 @@ services:
     command: '/bin/logd'
     volumes: 
       - logd3:/var/metrodb/logd
-  mapd:
+  mapd1:
     image: nicokahlert/metrodb
     ports: 
     - "7550:7550"
@@ -29,13 +29,60 @@ services:
       MAPD_INDEX_PATH: /var/metrodb/mapd
     command: '/bin/mapd logd1 logd2 logd3'
     volumes: 
-      - mapd:/var/metrodb/mapd
+      - mapd1:/var/metrodb/mapd
     depends_on: 
       - logd1
       - logd2
       - logd3
+  mapd2:
+    image: nicokahlert/metrodb
+    #ports: 
+    #- "7550:7550"
+    environment: 
+      MAPD_INDEX_PATH: /var/metrodb/mapd
+    command: '/bin/mapd logd1 logd2 logd3'
+    volumes: 
+      - mapd2:/var/metrodb/mapd
+    depends_on: 
+      - logd1
+      - logd2
+      - logd3
+  mapd3:
+    image: nicokahlert/metrodb
+    #ports: 
+    #- "7550:7550"
+    environment: 
+      MAPD_INDEX_PATH: /var/metrodb/mapd
+    command: '/bin/mapd logd1 logd2 logd3'
+    volumes: 
+      - mapd3:/var/metrodb/mapd
+    depends_on: 
+      - logd1
+      - logd2
+      - logd3
+  mond:
+    image: nicokahlert/metrodb
+    command: '/bin/mond'
+    depends_on: 
+      - mapd1
+      - mapd2
+      - mapd3
+  toolbox:
+    image: nicokahlert/metrodb
+    ports:
+    - "7080:7080"
+    command: '/bin/mapd-util mapd1 serve 7080'
+    depends_on: 
+      - mapd1
+      - mapd2
+      - mapd3
+    
 volumes: 
-  mapd:
+  mapd1:
+  mapd2:
+  mapd3:
   logd1:
   logd2:
   logd3:
+
+

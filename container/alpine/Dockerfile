@@ -27,3 +27,4 @@ COPY --from=mapd-builder /bin/mapd-util /bin/mapd-util
 RUN mkdir /var/metrodb/mapd
 ENV MAPD_DB_PATH=/opt/metrodb/mapd
 EXPOSE 7550
+EXPOSE 7080

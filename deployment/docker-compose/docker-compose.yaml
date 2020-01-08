@@ -76,7 +76,6 @@ services:
       - mapd1
       - mapd2
       - mapd3
-    
 volumes: 
   mapd1:
   mapd2:

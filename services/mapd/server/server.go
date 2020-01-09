@@ -21,21 +21,7 @@ func (server *MapdServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.
 
 func (server *MapdServer) SetSafe(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
 	reply := new(pb.SetReply)
-	reply.Err = func() bool {
-		server.mapd.setSafe(request.Key, request.Value)
-		errChan := make(chan bool)
-		defer func(errChan chan bool) {
-			r := recover()
-			if r != nil {
-				errChan <- false
-			} else {
-				errChan <- true
-			}
-		}(errChan)
-		rbool := <-errChan
-		close(errChan)
-		return rbool
-	}()
+	reply.Err = false
 	return reply, nil
 }
 

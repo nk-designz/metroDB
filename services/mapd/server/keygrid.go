@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"sort"
 	"time"
 
 	logd "github.com/nk-designz/metroDB/services/logd/client"
@@ -15,6 +16,12 @@ import (
 type Replica struct {
 	logStore int
 	offset   int64
+}
+
+type Logds struct {
+	logd *logd.Logd
+	name string
+	size int64
 }
 
 type Mapd struct {
@@ -26,13 +33,13 @@ type Mapd struct {
 			quit   chan struct{}
 		}
 	}
-	logds []*logd.Logd
+	logds []Logds
 }
 
 func (mapd *Mapd) init() error {
 	log.Println(`msg="initializing map deamon..."`)
 	// Add Logger File to Logd
-	mapd.logds = make([]*logd.Logd, len(os.Args))
+	mapd.logds = make([]Logds, len(os.Args))
 	file, err := os.OpenFile(
 		fmt.Sprintf("%smapd.db", os.Getenv("MAPD_INDEX_PATH")),
 		os.O_CREATE|os.O_RDWR|os.O_APPEND,
@@ -49,11 +56,17 @@ func (mapd *Mapd) init() error {
 		log.Println(
 			fmt.Sprintf(`msg="found key-value-pair" key="%s" offset="%x" logstore="%d"`, k, v[0].offset, v[0].logStore))
 	}
-	for i, v := range os.Args {
-		if i > 0 {
-			mapd.logds[i-1] = logd.New(v)
+	for index, name := range os.Args {
+		if index != 0 {
+			mapd.logds[index-1] = Logds{
+				logd: logd.New(name),
+				name: name,
+				size: rand.Int63()}
 		}
 	}
+	//TODO: Find out where the last entry nil comes from
+	mapd.logds = mapd.logds[:len(mapd.logds)-1]
+	log.Println(mapd.logds, os.Args)
 	return err
 }
 
@@ -104,10 +117,11 @@ func (mapd *Mapd) retrivePersistentIndex() error {
 }
 
 func (mapd *Mapd) set(key string, value []byte) {
-	// TODO: Based decision on Size in Logd
-	logdIndex := rand.Intn(len(mapd.logds) - 1)
-	//
-	logd := mapd.logds[logdIndex]
+	sort.Slice(mapd.logds, func(i, j int) bool {
+		return mapd.logds[i].size > mapd.logds[j].size
+	})
+	logdIndex := len(mapd.logds) - 1
+	logd := mapd.logds[logdIndex].logd
 	logd.Connect()
 	defer logd.Close()
 	offset := logd.Append(value)
@@ -126,7 +140,7 @@ func (mapd *Mapd) setSafe(key string, value []byte) {
 
 func (mapd *Mapd) get(key string) []byte {
 	entry := mapd.index.memory[key]
-	logd := mapd.logds[entry[0].logStore]
+	logd := mapd.logds[entry[0].logStore].logd
 	offset := entry[0].offset
 	logd.Connect()
 	defer logd.Close()

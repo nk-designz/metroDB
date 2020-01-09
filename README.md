@@ -1,6 +1,7 @@
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/nicokahlert/metrodb?style=flat-square)  
+![Logo](/assets/images/logo.png)  
 # MetroDB
-![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/nicokahlert/metrodb?style=flat-square) 
-A distributed Key-Value-Store for transaction-safety inspired by blockchain-technology.
+A distributed, scalable NoSQL Datastore based on immutable logs.
 # Components
 ## logd
 The Log-deamon is a immutable Logstore. It is managed by Mapd via GRPC calls on port 7558.

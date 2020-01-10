@@ -73,7 +73,7 @@ func (mapd *Mapd) init() error {
 		mapd.logds[index] = Logds{
 			logd: logd.New(name),
 			name: name,
-			size: rand.Int63()}
+			size: rand.Int63n(3)}
 	}
 	for index, name := range mapds {
 		mapd.cluster[index] = mapdClient.New(name)

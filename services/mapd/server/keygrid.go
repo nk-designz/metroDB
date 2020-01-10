@@ -129,11 +129,9 @@ func (mapd *Mapd) retrivePersistentIndex() error {
 }
 
 func (mapd *Mapd) set(key string, value []byte) {
-	log.Println(mapd.logds)
 	sort.Slice(mapd.logds, func(i, j int) bool {
 		return mapd.logds[i].size > mapd.logds[j].size
 	})
-	log.Println(mapd.logds)
 	logdIndexLength := len(mapd.logds)
 	logd1Index := logdIndexLength - 1
 	logd2Index := logdIndexLength - 2

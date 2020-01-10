@@ -4,7 +4,7 @@ metadata:
   name: metrodb
 spec:
   selector:
-    app: metrodb-mapds
+    app: mapds-metrodb
   ports:
   - name: metrodb-grpc
     port: 7550

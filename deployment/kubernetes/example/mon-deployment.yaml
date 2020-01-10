@@ -15,7 +15,7 @@ spec:
       - name: mond
         image: nicokahlert/metrodb
         command: ["/bin/mond"]
-        args: ["metrodb-monds-0","metrodb-monds-1","metrodb-monds-2"]
+        args: ["mapd-metrodb-0.cluster.local","metrodb-mapd-1.cluster.local","metrodb-mapd-2.cluster.local"]
         resources:
           limits:
             memory: "128Mi"

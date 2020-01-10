@@ -27,7 +27,7 @@ services:
     - "7550:7550"
     environment: 
       MAPD_INDEX_PATH: /var/metrodb/mapd
-    command: '/bin/mapd logd1 logd2 logd3'
+    command: '/bin/mapd -cluster mapd2,mapd3 -logds logd1,logd2,logd3'
     volumes: 
       - mapd1:/var/metrodb/mapd
     depends_on: 
@@ -40,7 +40,7 @@ services:
     #- "7550:7550"
     environment: 
       MAPD_INDEX_PATH: /var/metrodb/mapd
-    command: '/bin/mapd logd1 logd2 logd3'
+    command: '/bin/mapd -cluster mapd1,mapd3 -logds logd1,logd2,logd3'
     volumes: 
       - mapd2:/var/metrodb/mapd
     depends_on: 
@@ -53,7 +53,7 @@ services:
     #- "7550:7550"
     environment: 
       MAPD_INDEX_PATH: /var/metrodb/mapd
-    command: '/bin/mapd logd1 logd2 logd3'
+    command: '/bin/mapd -cluster mapd1,mapd2 -logds logd1,logd2,logd3'
     volumes: 
       - mapd3:/var/metrodb/mapd
     depends_on: 

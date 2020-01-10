@@ -3,14 +3,17 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	logd "github.com/nk-designz/metroDB/services/logd/client"
+	mapdClient "github.com/nk-designz/metroDB/services/mapd/client"
 )
 
 type Replica struct {
@@ -24,6 +27,8 @@ type Logds struct {
 	size int64
 }
 
+type cluster []*mapdClient.Mapd
+
 type Mapd struct {
 	index struct {
 		memory map[string][]Replica
@@ -33,13 +38,13 @@ type Mapd struct {
 			quit   chan struct{}
 		}
 	}
-	logds []Logds
+	logds   []Logds
+	cluster cluster
 }
 
 func (mapd *Mapd) init() error {
 	log.Println(`msg="initializing map deamon..."`)
 	// Add Logger File to Logd
-	mapd.logds = make([]Logds, len(os.Args))
 	file, err := os.OpenFile(
 		fmt.Sprintf("%smapd.db", os.Getenv("MAPD_INDEX_PATH")),
 		os.O_CREATE|os.O_RDWR|os.O_APPEND,
@@ -48,6 +53,7 @@ func (mapd *Mapd) init() error {
 	log.Println(fmt.Sprintf(`msg="Persisting to File: %s"`, mapd.index.disk.Name()))
 	err = mapd.retrivePersistentIndex()
 	if err != nil {
+		log.Println(fmt.Sprintf(`msg="Init blank map" err="%v"`, err))
 		mapd.index.memory = map[string][]Replica{}
 		err = nil
 	}
@@ -56,17 +62,23 @@ func (mapd *Mapd) init() error {
 		log.Println(
 			fmt.Sprintf(`msg="found key-value-pair" key="%s" offset="%x" logstore="%d"`, k, v[0].offset, v[0].logStore))
 	}
-	for index, name := range os.Args {
-		if index != 0 {
-			mapd.logds[index-1] = Logds{
-				logd: logd.New(name),
-				name: name,
-				size: rand.Int63()}
-		}
+	logdFlag := flag.String("logds", "logds-1.metrodb.cluster.local", "comma seperated list of logds")
+	mapdFlag := flag.String("cluster", "mapd-1.metro.cluster.local", "comman seperated list of mapds")
+	flag.Parse()
+	logds := strings.Split(*logdFlag, ",")
+	mapds := strings.Split(*mapdFlag, ",")
+	mapd.logds = make([]Logds, len(logds))
+	mapd.cluster = make(cluster, len(mapds))
+	for index, name := range logds {
+		mapd.logds[index] = Logds{
+			logd: logd.New(name),
+			name: name,
+			size: rand.Int63()}
 	}
-	//TODO: Find out where the last entry nil comes from
-	mapd.logds = mapd.logds[:len(mapd.logds)-1]
-	log.Println(mapd.logds, os.Args)
+	for index, name := range mapds {
+		mapd.cluster[index] = mapdClient.New(name)
+		mapd.cluster[index].Connect()
+	}
 	return err
 }
 
@@ -125,10 +137,16 @@ func (mapd *Mapd) set(key string, value []byte) {
 	logd.Connect()
 	defer logd.Close()
 	offset := logd.Append(value)
-	mapd.index.memory[key] = []Replica{
-		Replica{
+	if replicas, ok := mapd.index.memory[key]; ok {
+		mapd.index.memory[key] = append(replicas, Replica{
 			offset:   offset,
-			logStore: logdIndex}}
+			logStore: logdIndex})
+	} else {
+		mapd.index.memory[key] = []Replica{
+			Replica{
+				offset:   offset,
+				logStore: logdIndex}}
+	}
 	go mapd.updatePersistentIndex()
 	log.Println(`msg="set new key"`, key, len(value))
 }

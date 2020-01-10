@@ -157,9 +157,10 @@ func (mapd *Mapd) setSafe(key string, value []byte) {
 }
 
 func (mapd *Mapd) get(key string) []byte {
-	entry := mapd.index.memory[key]
-	logd := mapd.logds[entry[len(entry)-1].logStore].logd
-	offset := entry[0].offset
+	entrys := mapd.index.memory[key]
+	replic := len(entrys) - 1
+	logd := mapd.logds[entrys[replic].logStore].logd
+	offset := entrys[replic].offset
 	logd.Connect()
 	defer logd.Close()
 	log.Println(`msg="get key"`, key)

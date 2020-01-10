@@ -21,7 +21,7 @@ specs:
           - name: MAPD_INDEX_PATH
             value: "/var/metrodb/mapd"
           command: ["/bin/mapd"]
-          args: ["metrodb-logds-0","metrodb-logds-1","metrodb-logds-2"]
+          args: ["-cluster","metrodb-logds-0,metrodb-logds-1","-logds","metrodb-logds-0,metrodb-logds-1,metrodb-logds-2"]
           ports:
           - containerPort: 7558
             name: mapd-grpc

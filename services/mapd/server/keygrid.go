@@ -158,7 +158,7 @@ func (mapd *Mapd) setSafe(key string, value []byte) {
 
 func (mapd *Mapd) get(key string) []byte {
 	entry := mapd.index.memory[key]
-	logd := mapd.logds[entry[0].logStore].logd
+	logd := mapd.logds[entry[len(entry)-1].logStore].logd
 	offset := entry[0].offset
 	logd.Connect()
 	defer logd.Close()

@@ -132,20 +132,32 @@ func (mapd *Mapd) set(key string, value []byte) {
 	sort.Slice(mapd.logds, func(i, j int) bool {
 		return mapd.logds[i].size > mapd.logds[j].size
 	})
-	logdIndex := len(mapd.logds) - 1
-	logd := mapd.logds[logdIndex].logd
-	logd.Connect()
-	defer logd.Close()
-	offset := logd.Append(value)
+	logdIndexLength := len(mapd.logds)
+	logd1Index := logdIndexLength - 1
+	logd2Index := logdIndexLength - 2
+	logd1 := mapd.logds[logd1Index].logd
+	logd2 := mapd.logds[logd2Index].logd
+	logd1.Connect()
+	logd2.Connect()
+	defer logd1.Close()
+	defer logd2.Close()
+	offset1 := logd1.Append(value)
+	offset2 := logd2.Append(value)
 	if replicas, ok := mapd.index.memory[key]; ok {
 		mapd.index.memory[key] = append(replicas, Replica{
-			offset:   offset,
-			logStore: logdIndex})
+			offset:   offset1,
+			logStore: logd1Index})
+		mapd.index.memory[key] = append(replicas, Replica{
+			offset:   offset2,
+			logStore: logd2Index})
 	} else {
 		mapd.index.memory[key] = []Replica{
 			Replica{
-				offset:   offset,
-				logStore: logdIndex}}
+				offset:   offset1,
+				logStore: logd1Index},
+			Replica{
+				offset:   offset2,
+				logStore: logd2Index}}
 	}
 	go mapd.updatePersistentIndex()
 	log.Println(`msg="set new key"`, key, len(value))

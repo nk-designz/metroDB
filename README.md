@@ -68,6 +68,7 @@ func main() {
   value, err = db.Get("<key>"); if err != nil {
     panic(err)
   }
-  fmt.Fprintln(fmt.Sprintf("My value: %s", value))
+  fmt.Println(
+    fmt.Sprintf("My value: %s", value))
 }
 ```

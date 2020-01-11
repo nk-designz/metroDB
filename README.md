@@ -23,8 +23,7 @@ docker-compose up
 ```
 This will build us a three node mapd instance with three logds.
 ## Kubernetes
-**NOT READY YET :C**
-Of course do we provide nice YAMLs for deploying metroDB on the worlds favorite orchestrator:
+Of course do we provide nice YAMLs for deploying metroDB on [the worlds favorite orchestrator](https://kubernetes.io/):
 ```bash
 git clone https://github.com/nk-designz/metroDB.git
 cd metroDB/deployment/kubernetes/example

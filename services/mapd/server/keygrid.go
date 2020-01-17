@@ -14,6 +14,7 @@ import (
 
 	logd "github.com/nk-designz/metroDB/services/logd/client"
 	mapdClient "github.com/nk-designz/metroDB/services/mapd/client"
+	pb "github.com/nk-designz/metroDB/services/mapd/pb"
 )
 
 type Replica struct {
@@ -147,6 +148,11 @@ func (mapd *Mapd) set(key string, value []byte) {
 			mapd.index.memory[key] = []Replica{replica}
 		}
 		logdInstance.Close()
+		go func(replica Replica) {
+			for _, member := range mapd.cluster {
+				member.Replicate(&pb.Entry{Key: key, LogStore: int32(replica.logStore), Offset: replica.offset})
+			}
+		}(replica)
 	}
 	go mapd.updatePersistentIndex()
 	log.Println(`msg="set new key"`, key, len(value))

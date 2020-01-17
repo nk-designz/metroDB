@@ -111,19 +111,17 @@ func (mapd *Mapd) updatePersistentIndex() error {
 	buffer := new(bytes.Buffer)
 	encoder := gob.NewEncoder(buffer)
 	err := encoder.Encode(mapd.index.memory)
+	if err != nil {
+		panic(err)
+	}
 	_, err = mapd.index.disk.Write(buffer.Bytes())
 	return err
 }
 
 func (mapd *Mapd) retrivePersistentIndex() error {
 	var memoryIndex map[string][]Replica
-	var buffer []byte
-
 	log.Println(`msg="retrieving map from disk..."`)
-	bufferReader := new(bytes.Buffer)
-	mapd.index.disk.Read(buffer)
-	bufferReader.Read(buffer)
-	decoder := gob.NewDecoder(bufferReader)
+	decoder := gob.NewDecoder(mapd.index.disk)
 	err := decoder.Decode(&memoryIndex)
 	mapd.index.memory = memoryIndex
 	return err

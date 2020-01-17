@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"os"
@@ -52,7 +53,7 @@ func (mapd *Mapd) init() error {
 	mapd.index.disk = file
 	log.Println(fmt.Sprintf(`msg="Persisting to File: %s"`, mapd.index.disk.Name()))
 	err = mapd.retrivePersistentIndex()
-	if err != nil {
+	if err != nil && err != io.EOF {
 		log.Println(fmt.Sprintf(`msg="Init blank map" err="%v"`, err))
 		mapd.index.memory = map[string][]Replica{}
 		err = nil
@@ -132,7 +133,7 @@ func (mapd *Mapd) set(key string, value []byte) {
 	sort.Slice(mapd.logds, func(i, j int) bool {
 		return mapd.logds[i].size > mapd.logds[j].size
 	})
-	logdIndexLength := len(mapd.logds)
+	logdIndexLength := len(mapd.logds) //TODO: Build a anon func to reduce duplicity
 	logd1Index := logdIndexLength - 1
 	logd2Index := logdIndexLength - 2
 	logd1 := mapd.logds[logd1Index].logd

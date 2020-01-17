@@ -2,13 +2,13 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: logds-metrodb
-specs:
+spec:
   selector:
     matchLabels:
       app: logds-metrodb
-    serviceName: "logds-metrodb"
-    replicas: 3
-    template:
+  serviceName: "logds-metrodb"
+  replicas: 3
+  template:
       metadata:
         labels:
           app: logds-metrodb
@@ -34,11 +34,11 @@ specs:
           volumeMounts:
           - name: persistent-log
             mountPath: /var/metrodb/logd
-    volumeClaimTemplates:
+  volumeClaimTemplates:
     - metadata:
         name: persistent-log
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 10Gi
+            storage: 500Mi

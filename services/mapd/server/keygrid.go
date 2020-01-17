@@ -131,8 +131,7 @@ func (mapd *Mapd) set(key string, value []byte) {
 	sort.Slice(mapd.logds, func(i, j int) bool {
 		return mapd.logds[i].size > mapd.logds[j].size
 	})
-	logdIndexLength := len(mapd.logds)
-	for logdIndex := range []int{(logdIndexLength - 1), (logdIndexLength - 2)} {
+	for logdIndex := range []int{0, 1} {
 		logdInstance := mapd.logds[logdIndex].logd
 		logdInstance.Connect()
 		valueOffset := logdInstance.Append(value)

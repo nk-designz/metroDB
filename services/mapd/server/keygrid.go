@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"math/rand"
 	"os"
@@ -53,7 +52,7 @@ func (mapd *Mapd) init() error {
 	mapd.index.disk = file
 	log.Println(fmt.Sprintf(`msg="Persisting to File: %s"`, mapd.index.disk.Name()))
 	err = mapd.retrivePersistentIndex()
-	if err != nil && err != io.EOF {
+	if err != nil {
 		log.Println(fmt.Sprintf(`msg="Init blank map" err="%v"`, err))
 		mapd.index.memory = map[string][]Replica{}
 		err = nil

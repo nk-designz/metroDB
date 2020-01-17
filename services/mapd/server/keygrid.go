@@ -171,13 +171,16 @@ func (mapd *Mapd) setSafe(key string, value []byte) {
 }
 
 func (mapd *Mapd) get(key string) []byte {
-	entrys := mapd.index.memory[key]
-	replic := len(entrys) - 1
-	logd := mapd.logds[entrys[replic].logStore].logd
-	offset := entrys[replic].offset
-	logd.Connect()
-	defer logd.Close()
 	log.Println(`msg="get key"`, key)
-	return logd.Get(offset)
-
+	if entrys, exist := mapd.index.memory[key]; exist {
+		replic := len(entrys) - 1
+		logd := mapd.logds[entrys[replic].logStore].logd
+		offset := entrys[replic].offset
+		logd.Connect()
+		defer logd.Close()
+		return logd.Get(offset)
+	} else {
+		log.Println(`msg="key not found"`)
+		return []byte{}
+	}
 }

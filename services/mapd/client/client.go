@@ -41,6 +41,12 @@ func (mapd *Mapd) SetSafe(key string, value []byte) (bool, error) {
 	return t.Err, err
 }
 
+func (mapd *Mapd) Replicate(entry *pb.Entry) {
+	if _, err := mapd.client.Replicate(context.Background(), entry); err != nil {
+		panic(err)
+	}
+}
+
 func (mapd *Mapd) Get(key string) ([]byte, error) {
 	value, err := mapd.client.Get(context.Background(), &pb.GetRequest{Key: key})
 	if err != nil {

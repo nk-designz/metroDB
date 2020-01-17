@@ -132,34 +132,21 @@ func (mapd *Mapd) set(key string, value []byte) {
 	sort.Slice(mapd.logds, func(i, j int) bool {
 		return mapd.logds[i].size > mapd.logds[j].size
 	})
-	logdIndexLength := len(mapd.logds) //TODO: Build a anon func to reduce duplicity
-	logd1Index := logdIndexLength - 1
-	logd2Index := logdIndexLength - 2
-	logd1 := mapd.logds[logd1Index].logd
-	logd2 := mapd.logds[logd2Index].logd
-	logd1.Connect()
-	logd2.Connect()
-	defer logd1.Close()
-	defer logd2.Close()
-	offset1 := logd1.Append(value)
-	offset2 := logd2.Append(value)
-	mapd.logds[logd1Index].size = offset1
-	mapd.logds[logd2Index].size = offset2
-	if replicas, ok := mapd.index.memory[key]; ok {
-		mapd.index.memory[key] = append(replicas, Replica{
-			offset:   offset1,
-			logStore: logd1Index})
-		mapd.index.memory[key] = append(replicas, Replica{
-			offset:   offset2,
-			logStore: logd2Index})
-	} else {
-		mapd.index.memory[key] = []Replica{
-			Replica{
-				offset:   offset1,
-				logStore: logd1Index},
-			Replica{
-				offset:   offset2,
-				logStore: logd2Index}}
+	logdIndexLength := len(mapd.logds)
+	for logdIndex := range []int{(logdIndexLength - 1), (logdIndexLength - 2)} {
+		logdInstance := mapd.logds[logdIndex].logd
+		logdInstance.Connect()
+		valueOffset := logdInstance.Append(value)
+		mapd.logds[logdIndex].size = valueOffset
+		replica := Replica{
+			offset:   valueOffset,
+			logStore: logdIndex}
+		if replicas, ok := mapd.index.memory[key]; ok {
+			mapd.index.memory[key] = append(replicas, replica)
+		} else {
+			mapd.index.memory[key] = []Replica{replica}
+		}
+		logdInstance.Close()
 	}
 	go mapd.updatePersistentIndex()
 	log.Println(`msg="set new key"`, key, len(value))
@@ -182,5 +169,13 @@ func (mapd *Mapd) get(key string) []byte {
 	} else {
 		log.Println(`msg="key not found"`)
 		return []byte{}
+	}
+}
+
+func (mapd *Mapd) setReplica(key string, replica Replica) {
+	if replicas, ok := mapd.index.memory[key]; ok {
+		mapd.index.memory[key] = append(replicas, replica)
+	} else {
+		mapd.index.memory[key] = []Replica{replica}
 	}
 }

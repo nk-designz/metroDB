@@ -18,8 +18,8 @@ import (
 )
 
 type Replica struct {
-	logStore int
-	offset   int64
+	LogStore int
+	Offset   int64
 }
 
 type Logds struct {
@@ -61,7 +61,7 @@ func (mapd *Mapd) init() error {
 	mapd.sheduleDiskSync()
 	for k, v := range mapd.index.memory {
 		log.Println(
-			fmt.Sprintf(`msg="found key-value-pair" key="%s" offset="%x" logstore="%d"`, k, v[0].offset, v[0].logStore))
+			fmt.Sprintf(`msg="found key-value-pair" key="%s" offset="%x" logstore="%d"`, k, v[0].Offset, v[0].LogStore))
 	}
 	logdFlag := flag.String("logds", "logds-1.metrodb.cluster.local", "comma seperated list of logds")
 	mapdFlag := flag.String("cluster", "mapd-1.metro.cluster.local", "comman seperated list of mapds")
@@ -138,8 +138,8 @@ func (mapd *Mapd) set(key string, value []byte) {
 		valueOffset := logdInstance.Append(value)
 		mapd.logds[logdIndex].size = valueOffset
 		replica := Replica{
-			offset:   valueOffset,
-			logStore: logdIndex}
+			Offset:   valueOffset,
+			LogStore: logdIndex}
 		if replicas, ok := mapd.index.memory[key]; ok {
 			mapd.index.memory[key] = append(replicas, replica)
 		} else {
@@ -148,7 +148,7 @@ func (mapd *Mapd) set(key string, value []byte) {
 		logdInstance.Close()
 		go func(replica Replica) {
 			for _, member := range mapd.cluster {
-				member.Replicate(&pb.Entry{Key: key, LogStore: int32(replica.logStore), Offset: replica.offset})
+				member.Replicate(&pb.Entry{Key: key, LogStore: int32(replica.LogStore), Offset: replica.Offset})
 			}
 		}(replica)
 	}
@@ -165,8 +165,8 @@ func (mapd *Mapd) get(key string) []byte {
 	log.Println(`msg="get key"`, key)
 	if entrys, exist := mapd.index.memory[key]; exist {
 		replic := len(entrys) - 1
-		logd := mapd.logds[entrys[replic].logStore].logd
-		offset := entrys[replic].offset
+		logd := mapd.logds[entrys[replic].LogStore].logd
+		offset := entrys[replic].Offset
 		logd.Connect()
 		defer logd.Close()
 		return logd.Get(offset)

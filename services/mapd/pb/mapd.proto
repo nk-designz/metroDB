@@ -6,6 +6,7 @@ service Mapd {
     rpc set (SetRequest) returns (SetReply) {}
     rpc setSafe (SetRequest) returns (SetReply) {}
     rpc get (GetRequest) returns (GetReply) {}
+    rpc replicate (Entry) returns (Void) {}
 }
 
 message GetRequest {
@@ -24,3 +25,11 @@ message GetReply {
 message SetReply {
     bool err = 1;
 }
+
+message Entry {
+    string key = 1;
+    int32  logStore = 2;
+    int64  offset = 3;
+}
+
+message Void {}

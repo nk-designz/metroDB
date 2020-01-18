@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/gob"
 	"flag"
 	"fmt"
@@ -108,13 +107,11 @@ func (mapd *Mapd) sheduleDiskSync() {
 }
 
 func (mapd *Mapd) updatePersistentIndex() error {
-	buffer := new(bytes.Buffer)
-	encoder := gob.NewEncoder(buffer)
+	encoder := gob.NewEncoder(mapd.index.disk)
 	err := encoder.Encode(mapd.index.memory)
 	if err != nil {
 		panic(err)
 	}
-	_, err = mapd.index.disk.Write(buffer.Bytes())
 	return err
 }
 

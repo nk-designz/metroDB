@@ -1,0 +1,18 @@
+apiVersion: skaffold/v1
+kind: Config
+metadata:
+  name: metrodb
+build:
+  artifacts:
+  - image: nicokahlert/metrodb
+    context: container/alpine
+  #- image: nicokahlert/metrodb:ubi-latest
+  #  context: container/redhat
+deploy:
+  kubectl:
+    manifests:
+    - deployment/kubernetes/logd-statefulset.yaml
+    - deployment/kubernetes/mapd-statefulset.yaml
+    - deployment/kubernetes/metrodb-service.yaml
+    - deployment/kubernetes/mon-deployment.yaml
+    - deployment/kubernetes/toolbox-pod.yaml

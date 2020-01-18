@@ -116,10 +116,13 @@ func (mapd *Mapd) updatePersistentIndex() error {
 }
 
 func (mapd *Mapd) retrivePersistentIndex() error {
-	var memoryIndex map[string][]Replica
+	filestat, err := mapd.index.disk.Stat(); if err != nil {
+		panic(err)
+	}
+	memoryIndex := make(map[string][]Replica, filestat.Size())
 	log.Println(`msg="retrieving map from disk..."`)
 	decoder := gob.NewDecoder(mapd.index.disk)
-	err := decoder.Decode(&memoryIndex)
+	err = decoder.Decode(&memoryIndex)
 	mapd.index.memory = memoryIndex
 	return err
 }

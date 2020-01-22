@@ -1,27 +1,33 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mapds-metrodb
+  name: mapds
+  namespace: metrodb
 spec:
   selector:
     matchLabels:
-      app: mapds-metrodb
-  serviceName: "mapds-metrodb"
+      app: mapd
+  serviceName: mapds
   replicas: 3
   template:
     metadata:
       labels:
-        app: mapds-metrodb
+        app: mapd
     spec:
       terminationGracePeriodSeconds: 30
       containers:
-      - name: logd 
+      - name: mapd 
         image: nicokahlert/metrodb
         env:
         - name: MAPD_INDEX_PATH
-          value: "/var/metrodb/mapd"
-        command: ["/bin/mapd"]
-        args: ["-cluster","metrodb-mapds-0,metrodb-mapds-1,metrodb-mapds-2","-logds","metrodb-logds-0,metrodb-logds-1,metrodb-logds-2"]
+          value: /var/metrodb/mapd
+        command:
+          - /bin/mapd
+        args: 
+          - -cluster 
+          - mapd-0.mapds.metrodb.svc.cluster.local,mapd-1.mapds.metrodb.svc.cluster.local,mapd-2.mapds.metrodb.svc.cluster.local
+          - -logds
+          - logd-0.logds.metrodb.svc.cluster.local,logd-1.logds.metrodb.svc.cluster.local,logd-2.logds.metrodb.svc.cluster.local
         ports:
         - containerPort: 7558
           name: mapd-grpc

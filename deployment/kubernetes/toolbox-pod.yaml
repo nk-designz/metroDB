@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: toolbox
+  namespace: metrodb
   labels:
     name: toolbox
 spec:
@@ -9,8 +10,11 @@ spec:
   - name: toolbox
     image: nicokahlert/metrodb
     command:
-      - "/bin/mapd-util"
-      - "metrodb-mapd-1.cluster.local serve"
+      - /bin/mapd-util
+    args:
+      - metrodb.metrodb.svc.cluster.local
+      - serve
+      - '7080'
     resources:
       limits:
         memory: "128Mi"

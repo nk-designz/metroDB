@@ -46,7 +46,7 @@ func (mapd *Mapd) init() error {
 	log.Println(`msg="initializing map deamon..."`)
 	// Add Logger File to Logd
 	file, err := os.OpenFile(
-		fmt.Sprintf("%smapd.db", os.Getenv("MAPD_INDEX_PATH")),
+		fmt.Sprintf("%s/mapd.db", os.Getenv("MAPD_INDEX_PATH")),
 		os.O_CREATE|os.O_RDWR|os.O_APPEND,
 		0600)
 	mapd.index.disk = file
@@ -116,7 +116,8 @@ func (mapd *Mapd) updatePersistentIndex() error {
 }
 
 func (mapd *Mapd) retrivePersistentIndex() error {
-	filestat, err := mapd.index.disk.Stat(); if err != nil {
+	filestat, err := mapd.index.disk.Stat()
+	if err != nil {
 		panic(err)
 	}
 	memoryIndex := make(map[string][]Replica, filestat.Size())

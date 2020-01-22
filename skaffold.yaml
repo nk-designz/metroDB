@@ -1,4 +1,4 @@
-apiVersion: skaffold/v1
+apiVersion: skaffold/v2alpha2
 kind: Config
 metadata:
   name: metrodb
@@ -6,13 +6,14 @@ build:
   artifacts:
   - image: nicokahlert/metrodb
     context: container/alpine
-  #- image: nicokahlert/metrodb:ubi-latest
-  #  context: container/redhat
+    #kaniko:
+    #  dockerfile: container/alpine/Dockerfile
+    #  buildArgs: 
+    #    cache: --no-cache
+    #cluster:
+    #  pullSecretName: kaniko-build-secret
+    #  namespace: metrodb
 deploy:
   kubectl:
     manifests:
-    - deployment/kubernetes/logd-statefulset.yaml
-    - deployment/kubernetes/mapd-statefulset.yaml
-    - deployment/kubernetes/metrodb-service.yaml
-    - deployment/kubernetes/mon-deployment.yaml
-    - deployment/kubernetes/toolbox-pod.yaml
+    - deployment/kubernetes/*.yaml

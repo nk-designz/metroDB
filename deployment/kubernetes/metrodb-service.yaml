@@ -2,9 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: metrodb
+  namespace: metrodb
 spec:
   selector:
-    app: mapds-metrodb
+    app: mapd
   ports:
   - name: metrodb-grpc
     port: 7550

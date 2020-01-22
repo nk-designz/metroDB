@@ -62,7 +62,7 @@ services:
       - logd3
   mond:
     image: nicokahlert/metrodb
-    command: '/bin/mond'
+    command: '/bin/mond mapd1 mapd2 mapd3'
     depends_on: 
       - mapd1
       - mapd2

@@ -25,9 +25,9 @@ spec:
           - /bin/mapd
         args: 
           - -cluster 
-          - mapd-0.mapds.metrodb.svc.cluster.local,mapd-1.mapds.metrodb.svc.cluster.local,mapd-2.mapds.metrodb.svc.cluster.local
+          - mapds-0.mapds.metrodb.svc.cluster.local,mapds-1.mapds.metrodb.svc.cluster.local,mapds-2.mapds.metrodb.svc.cluster.local
           - -logds
-          - logd-0.logds.metrodb.svc.cluster.local,logd-1.logds.metrodb.svc.cluster.local,logd-2.logds.metrodb.svc.cluster.local
+          - logds-0.logds.metrodb.svc.cluster.local,logds-1.logds.metrodb.svc.cluster.local,logds-2.logds.metrodb.svc.cluster.local
         ports:
         - containerPort: 7558
           name: mapd-grpc

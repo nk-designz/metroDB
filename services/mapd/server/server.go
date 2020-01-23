@@ -13,7 +13,6 @@ type MapdServer struct {
 
 func (server *MapdServer) Set(ctx context.Context, request *pb.SetRequest) (*pb.SetReply, error) {
 	reply := new(pb.SetReply)
-	// TODO: Error handling on Panic
 	server.mapd.set(request.Key, request.Value)
 	reply.Err = false
 	return reply, nil

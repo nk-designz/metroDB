@@ -149,3 +149,13 @@ func (mapd *Mapd) setReplica(key string, replica Replica) {
 		mapd.index.memory[key] = []Replica{replica}
 	}
 }
+
+func (mapd *Mapd) getSum(key string) []byte {
+	if replicas, ok := mapd.index.memory[key]; ok {
+		for replicaLength := len(replicas)-1; replicaLength == 0; replicaLength-- {
+			replica := replicas[replicaLength]
+				return mapd.logds[replica.LogStore].logd.Get(replica.Sum)
+		}
+	}
+	return []byte{}
+}

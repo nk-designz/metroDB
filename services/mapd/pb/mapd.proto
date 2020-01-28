@@ -7,6 +7,7 @@ service Mapd {
     rpc setSafe (SetRequest) returns (SetReply) {}
     rpc get (GetRequest) returns (GetReply) {}
     rpc replicate (Entry) returns (Void) {}
+    rpc getSum (GetRequest) returns (GetReply) {}
 }
 
 message GetRequest {

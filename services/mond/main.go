@@ -29,7 +29,6 @@ func main() {
 func schedule(mapds cluster) {
 	for _, mapd := range mapds {
 		mapd.Connect()
-		log.Println(
-			fmt.Print(mapd.GetRandProbe()))
+		log.Println(mapd.GetRandProbe())
 	}
 }

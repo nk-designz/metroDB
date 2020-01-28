@@ -30,6 +30,7 @@ message Entry {
     string key = 1;
     int32  logStore = 2;
     int64  offset = 3;
+    int64  sumOffset = 4;
 }
 
 message Void {}

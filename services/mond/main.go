@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	mapdClient "github.com/nk-designz/metroDB/services/mapd/client"
 )
@@ -18,8 +19,10 @@ func main() {
 			mapds[index-1] = mapdClient.New(hostname)
 		}
 	}
+	time.Sleep(2 * time.Minute)
 	for {
 		schedule(mapds)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 

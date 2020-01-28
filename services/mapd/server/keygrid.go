@@ -164,7 +164,11 @@ func (mapd *Mapd) getRandProbe() (string, int64, []byte, []byte, error) {
 	randomBreak := rand.Intn(len(mapd.index.memory))
 	for key, replica := range mapd.index.memory {
 		if interator >= randomBreak {
-			return key, replica[0].Offset, mapd.logds[replica[0].LogStore].logd.Get(replica[0].Sum), mapd.get(key), nil
+			return key,
+				replica[0].Offset,
+				mapd.logds[replica[0].LogStore].logd.Get(replica[0].Sum),
+				mapd.get(key),
+				nil
 		}
 		interator++
 	}

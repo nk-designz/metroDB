@@ -104,7 +104,11 @@ func (mapd *Mapd) set(key string, value []byte) {
 		logdInstance.Close()
 		go func(replica Replica) {
 			for _, member := range mapd.cluster {
-				member.Replicate(&pb.Entry{Key: key, LogStore: int32(replica.LogStore), Offset: replica.Offset})
+				member.Replicate(
+					&pb.Entry{
+						Key:      key,
+						LogStore: int32(replica.LogStore),
+						Offset:   replica.Offset})
 			}
 		}(replica)
 	}

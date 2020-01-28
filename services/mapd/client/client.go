@@ -41,10 +41,15 @@ func (mapd *Mapd) SetSafe(key string, value []byte) (bool, error) {
 	return t.Err, err
 }
 
-func (mapd *Mapd) Replicate(entry *pb.Entry) {
+func (mapd *Mapd) Replicate(entry *pb.Entry) error {
 	if _, err := mapd.client.Replicate(context.Background(), entry); err != nil {
-		panic(err)
+		return err
 	}
+}
+
+func (mapd *Mapd) GetSum(key string) ([]byte, error) {
+	sum, err := mapd.client.GetSum(context.Background(), &pb.GetRequest{Key: key})
+	return sum.Value, err
 }
 
 func (mapd *Mapd) Get(key string) ([]byte, error) {

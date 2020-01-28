@@ -39,9 +39,8 @@ func (mapd *Mapd) SetSafe(key string, value []byte) (bool, error) {
 }
 
 func (mapd *Mapd) Replicate(entry *pb.Entry) error {
-	if _, err := mapd.client.Replicate(context.Background(), entry); err != nil {
-		return err
-	}
+	_, err := mapd.client.Replicate(context.Background(), entry)
+	return err
 }
 
 func (mapd *Mapd) GetSum(key string) ([]byte, error) {

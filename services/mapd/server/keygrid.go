@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/gob"
 	"log"
+	"math/rand"
 	"os"
 	"sort"
 	"time"
@@ -150,12 +151,23 @@ func (mapd *Mapd) setReplica(key string, replica Replica) {
 	}
 }
 
-func (mapd *Mapd) getSum(key string) []byte {
-	if replicas, ok := mapd.index.memory[key]; ok {
-		for replicaLength := len(replicas) - 1; replicaLength == 0; replicaLength-- {
-			replica := replicas[replicaLength]
-			return mapd.logds[replica.LogStore].logd.Get(replica.Sum)
+func (mapd *Mapd) getDefiProbe(key string, deph uint64) (string, int64, []byte, []byte, error) {
+		return key, 
+			mapd.index.memory[key][deph].Offset,
+			mapd.logds[mapd.index.memory[key][deph].LogStore].logd.Get(mapd.index.memory[key][deph].Sum),
+			mapd.get(key),
+			nil
+}
+
+func (mapd *Mapd) getRandProbe() (string, int64, []byte, []byte, error) {
+	interator := 0
+	randomBreak := rand.Intn(len(mapd.index.memory))
+	for key, replica := range mapd.index.memory {
+		if interator >= randomBreak {
+			return key, replica[0].Offset, mapd.logds[replica[0].LogStore].logd.Get(replica[0].Sum), mapd.get(key), nil
+			break
 		}
+		interator++
 	}
-	return []byte{}
+	return "", 0, []byte{}, []byte{}, nil //TODO Error handling
 }

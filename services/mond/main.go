@@ -27,6 +27,6 @@ func schedule(mapds cluster) {
 	for _, mapd := range mapds {
 		mapd.Connect()
 		log.Println(
-			fmt.Println(mapd))
+			fmt.Print(mapd))
 	}
 }

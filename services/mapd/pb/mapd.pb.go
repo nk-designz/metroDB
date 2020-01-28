@@ -282,6 +282,116 @@ func (m *Void) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Void proto.InternalMessageInfo
 
+type ProbeRequest struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Deph                 uint64   `protobuf:"varint,2,opt,name=deph,proto3" json:"deph,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProbeRequest) Reset()         { *m = ProbeRequest{} }
+func (m *ProbeRequest) String() string { return proto.CompactTextString(m) }
+func (*ProbeRequest) ProtoMessage()    {}
+func (*ProbeRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_47c62a75174acd61, []int{6}
+}
+
+func (m *ProbeRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProbeRequest.Unmarshal(m, b)
+}
+func (m *ProbeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProbeRequest.Marshal(b, m, deterministic)
+}
+func (m *ProbeRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProbeRequest.Merge(m, src)
+}
+func (m *ProbeRequest) XXX_Size() int {
+	return xxx_messageInfo_ProbeRequest.Size(m)
+}
+func (m *ProbeRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProbeRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProbeRequest proto.InternalMessageInfo
+
+func (m *ProbeRequest) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *ProbeRequest) GetDeph() uint64 {
+	if m != nil {
+		return m.Deph
+	}
+	return 0
+}
+
+type ProbeReply struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Offset               int64    `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Hash                 []byte   `protobuf:"bytes,3,opt,name=hash,proto3" json:"hash,omitempty"`
+	Value                []byte   `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProbeReply) Reset()         { *m = ProbeReply{} }
+func (m *ProbeReply) String() string { return proto.CompactTextString(m) }
+func (*ProbeReply) ProtoMessage()    {}
+func (*ProbeReply) Descriptor() ([]byte, []int) {
+	return fileDescriptor_47c62a75174acd61, []int{7}
+}
+
+func (m *ProbeReply) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProbeReply.Unmarshal(m, b)
+}
+func (m *ProbeReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProbeReply.Marshal(b, m, deterministic)
+}
+func (m *ProbeReply) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProbeReply.Merge(m, src)
+}
+func (m *ProbeReply) XXX_Size() int {
+	return xxx_messageInfo_ProbeReply.Size(m)
+}
+func (m *ProbeReply) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProbeReply.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProbeReply proto.InternalMessageInfo
+
+func (m *ProbeReply) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *ProbeReply) GetOffset() int64 {
+	if m != nil {
+		return m.Offset
+	}
+	return 0
+}
+
+func (m *ProbeReply) GetHash() []byte {
+	if m != nil {
+		return m.Hash
+	}
+	return nil
+}
+
+func (m *ProbeReply) GetValue() []byte {
+	if m != nil {
+		return m.Value
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*GetRequest)(nil), "mapd.GetRequest")
 	proto.RegisterType((*SetRequest)(nil), "mapd.SetRequest")
@@ -289,31 +399,37 @@ func init() {
 	proto.RegisterType((*SetReply)(nil), "mapd.SetReply")
 	proto.RegisterType((*Entry)(nil), "mapd.Entry")
 	proto.RegisterType((*Void)(nil), "mapd.Void")
+	proto.RegisterType((*ProbeRequest)(nil), "mapd.ProbeRequest")
+	proto.RegisterType((*ProbeReply)(nil), "mapd.ProbeReply")
 }
 
 func init() { proto.RegisterFile("mapd.proto", fileDescriptor_47c62a75174acd61) }
 
 var fileDescriptor_47c62a75174acd61 = []byte{
-	// 290 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xd1, 0x4a, 0xbc, 0x40,
-	0x14, 0xc6, 0x77, 0xfe, 0xe3, 0xfa, 0xd7, 0x53, 0x84, 0x0c, 0x11, 0x22, 0x4b, 0xc8, 0x5c, 0x84,
-	0x0b, 0xb5, 0x17, 0xd5, 0x13, 0x04, 0xe1, 0x55, 0x04, 0x23, 0x74, 0xd1, 0x9d, 0xe5, 0x51, 0x96,
-	0xd5, 0x66, 0x1a, 0xc7, 0xc0, 0xc7, 0xed, 0x4d, 0xc2, 0xb1, 0x52, 0x28, 0x62, 0xef, 0xce, 0x77,
-	0xbe, 0x9f, 0xdf, 0x71, 0xce, 0x0c, 0x40, 0x93, 0xab, 0x62, 0xa3, 0xb4, 0x34, 0x92, 0x39, 0x43,
-	0xcd, 0x4f, 0x01, 0x52, 0x34, 0x02, 0x5f, 0x3b, 0x6c, 0x0d, 0x0b, 0x80, 0xee, 0xb0, 0x0f, 0x49,
-	0x4c, 0x12, 0x5f, 0x0c, 0x25, 0xbf, 0x06, 0xc8, 0xfe, 0xf0, 0xd9, 0x31, 0x2c, 0xdf, 0xf2, 0xba,
-	0xc3, 0xf0, 0x5f, 0x4c, 0x92, 0x43, 0x31, 0x0a, 0x1e, 0x83, 0x67, 0x53, 0x55, 0x3d, 0x23, 0xc8,
-	0x9c, 0x58, 0x81, 0x97, 0x7d, 0x11, 0x01, 0x50, 0xd4, 0xda, 0xfa, 0x9e, 0x18, 0x4a, 0xbe, 0x83,
-	0xe5, 0xed, 0x8b, 0xd1, 0xfd, 0x2f, 0x03, 0x23, 0xf0, 0x6a, 0x59, 0x65, 0x46, 0xea, 0x71, 0xe6,
-	0x52, 0x7c, 0x6b, 0x76, 0x02, 0xae, 0x2c, 0xcb, 0x16, 0x4d, 0x48, 0x63, 0x92, 0x50, 0xf1, 0xa9,
-	0xd8, 0x0a, 0xfc, 0xb6, 0x6b, 0xee, 0x47, 0xcb, 0xb1, 0xd6, 0xd4, 0xe0, 0x2e, 0x38, 0x0f, 0x72,
-	0x5b, 0x5c, 0xbe, 0x13, 0x70, 0xee, 0x72, 0x55, 0xb0, 0x35, 0xd0, 0xe1, 0xab, 0x60, 0x63, 0xb7,
-	0x35, 0x1d, 0x3f, 0x3a, 0x9a, 0x75, 0x54, 0xdd, 0xf3, 0x05, 0xbb, 0x80, 0xff, 0x2d, 0x9a, 0x2c,
-	0x2f, 0x71, 0x2f, 0x7c, 0x0d, 0xb4, 0x9a, 0x92, 0xd3, 0x1f, 0x68, 0x3a, 0xa1, 0x67, 0xe0, 0x6b,
-	0x54, 0xf5, 0xf6, 0x39, 0x37, 0xc8, 0x0e, 0x46, 0xdb, 0xee, 0x24, 0x82, 0x51, 0x0c, 0xff, 0xcc,
-	0x17, 0xec, 0x1c, 0xdc, 0x0a, 0x4d, 0xd6, 0x35, 0xfb, 0xa4, 0xde, 0xb8, 0x8f, 0xf6, 0xda, 0x9f,
-	0x5c, 0xfb, 0x06, 0xae, 0x3e, 0x02, 0x00, 0x00, 0xff, 0xff, 0x8d, 0xb0, 0x73, 0xba, 0x11, 0x02,
-	0x00, 0x00,
+	// 363 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0x41, 0x4b, 0xeb, 0x40,
+	0x10, 0x6e, 0x9a, 0x6d, 0x5e, 0x3a, 0x2f, 0x3c, 0xc2, 0xf2, 0x90, 0x12, 0x8a, 0x84, 0x3d, 0x48,
+	0x7b, 0xb0, 0x07, 0x2d, 0xfe, 0x00, 0x51, 0x7a, 0x12, 0x65, 0x03, 0x1e, 0x3c, 0x99, 0x9a, 0x49,
+	0x5b, 0x9a, 0x36, 0x71, 0xb3, 0x15, 0xfa, 0x5b, 0xfc, 0xb3, 0x92, 0xd9, 0x6a, 0x52, 0xad, 0xe2,
+	0x6d, 0x66, 0xbe, 0xef, 0x9b, 0x99, 0xfd, 0x66, 0x01, 0x56, 0x71, 0x91, 0x8c, 0x0a, 0x95, 0xeb,
+	0x9c, 0xb3, 0x2a, 0x16, 0xc7, 0x00, 0x13, 0xd4, 0x12, 0x9f, 0x37, 0x58, 0x6a, 0xee, 0x83, 0xbd,
+	0xc4, 0x6d, 0xcf, 0x0a, 0xad, 0x41, 0x57, 0x56, 0xa1, 0x18, 0x03, 0x44, 0x3f, 0xe0, 0xfc, 0x3f,
+	0x74, 0x5e, 0xe2, 0x6c, 0x83, 0xbd, 0x76, 0x68, 0x0d, 0x3c, 0x69, 0x12, 0x11, 0x82, 0x4b, 0x5d,
+	0x8b, 0xac, 0xc1, 0xb0, 0x9a, 0x8c, 0x3e, 0xb8, 0xd1, 0x3b, 0xc3, 0x07, 0x1b, 0x95, 0x22, 0xdc,
+	0x95, 0x55, 0x28, 0x96, 0xd0, 0xb9, 0x5e, 0x6b, 0xb5, 0x3d, 0x30, 0x30, 0x00, 0x37, 0xcb, 0x67,
+	0x91, 0xce, 0x95, 0x99, 0xd9, 0x91, 0x1f, 0x39, 0x3f, 0x02, 0x27, 0x4f, 0xd3, 0x12, 0x75, 0xcf,
+	0x0e, 0xad, 0x81, 0x2d, 0x77, 0x19, 0xef, 0x43, 0xb7, 0xdc, 0xac, 0x6e, 0x0d, 0xc4, 0x08, 0xaa,
+	0x0b, 0xc2, 0x01, 0x76, 0x9f, 0x2f, 0x12, 0x31, 0x06, 0xef, 0x4e, 0xe5, 0x53, 0xfc, 0xfe, 0xb1,
+	0x1c, 0x58, 0x82, 0xc5, 0x9c, 0xe6, 0x32, 0x49, 0xb1, 0x78, 0x04, 0xd8, 0xa9, 0x76, 0x4f, 0xf9,
+	0xa4, 0xa9, 0x77, 0x6a, 0xef, 0xed, 0xc4, 0x81, 0xcd, 0xe3, 0x72, 0x4e, 0x9b, 0x7a, 0x92, 0xe2,
+	0xda, 0x2a, 0xd6, 0xb0, 0xea, 0xec, 0xb5, 0x0d, 0xec, 0x26, 0x2e, 0x12, 0x3e, 0x04, 0xbb, 0x52,
+	0xfa, 0x23, 0xba, 0x62, 0x7d, 0x96, 0xe0, 0x5f, 0xa3, 0x52, 0x64, 0x5b, 0xd1, 0xe2, 0xa7, 0xf0,
+	0xa7, 0x44, 0x1d, 0xc5, 0x29, 0xfe, 0x8a, 0x3e, 0x04, 0x7b, 0x56, 0x77, 0x9e, 0x7c, 0xa1, 0x4e,
+	0x6a, 0xea, 0x09, 0x74, 0x15, 0x16, 0xd9, 0xe2, 0x29, 0xd6, 0xc8, 0xff, 0x1a, 0x98, 0x6e, 0x15,
+	0x80, 0x49, 0xc8, 0xcb, 0x16, 0xbf, 0x00, 0x6f, 0x86, 0xfa, 0x0a, 0xd3, 0x05, 0xd9, 0xc3, 0xb9,
+	0x41, 0x9b, 0x0e, 0x07, 0xfe, 0x5e, 0xcd, 0xf4, 0x1f, 0x91, 0x4e, 0xc6, 0xeb, 0xc4, 0xe8, 0x1a,
+	0x5d, 0x0f, 0xf1, 0x2f, 0x9d, 0x07, 0xfa, 0xc8, 0x53, 0x87, 0x7e, 0xf5, 0xf9, 0x5b, 0x00, 0x00,
+	0x00, 0xff, 0xff, 0x26, 0x4f, 0x0b, 0xf3, 0xe3, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -332,7 +448,8 @@ type MapdClient interface {
 	SetSafe(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetReply, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetReply, error)
 	Replicate(ctx context.Context, in *Entry, opts ...grpc.CallOption) (*Void, error)
-	GetSum(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetReply, error)
+	GetDefiProbe(ctx context.Context, in *ProbeRequest, opts ...grpc.CallOption) (*ProbeReply, error)
+	GetRandProbe(ctx context.Context, in *Void, opts ...grpc.CallOption) (*ProbeReply, error)
 }
 
 type mapdClient struct {
@@ -379,9 +496,18 @@ func (c *mapdClient) Replicate(ctx context.Context, in *Entry, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *mapdClient) GetSum(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetReply, error) {
-	out := new(GetReply)
-	err := c.cc.Invoke(ctx, "/mapd.Mapd/getSum", in, out, opts...)
+func (c *mapdClient) GetDefiProbe(ctx context.Context, in *ProbeRequest, opts ...grpc.CallOption) (*ProbeReply, error) {
+	out := new(ProbeReply)
+	err := c.cc.Invoke(ctx, "/mapd.Mapd/getDefiProbe", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mapdClient) GetRandProbe(ctx context.Context, in *Void, opts ...grpc.CallOption) (*ProbeReply, error) {
+	out := new(ProbeReply)
+	err := c.cc.Invoke(ctx, "/mapd.Mapd/getRandProbe", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -394,7 +520,8 @@ type MapdServer interface {
 	SetSafe(context.Context, *SetRequest) (*SetReply, error)
 	Get(context.Context, *GetRequest) (*GetReply, error)
 	Replicate(context.Context, *Entry) (*Void, error)
-	GetSum(context.Context, *GetRequest) (*GetReply, error)
+	GetDefiProbe(context.Context, *ProbeRequest) (*ProbeReply, error)
+	GetRandProbe(context.Context, *Void) (*ProbeReply, error)
 }
 
 // UnimplementedMapdServer can be embedded to have forward compatible implementations.
@@ -413,8 +540,11 @@ func (*UnimplementedMapdServer) Get(ctx context.Context, req *GetRequest) (*GetR
 func (*UnimplementedMapdServer) Replicate(ctx context.Context, req *Entry) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Replicate not implemented")
 }
-func (*UnimplementedMapdServer) GetSum(ctx context.Context, req *GetRequest) (*GetReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSum not implemented")
+func (*UnimplementedMapdServer) GetDefiProbe(ctx context.Context, req *ProbeRequest) (*ProbeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDefiProbe not implemented")
+}
+func (*UnimplementedMapdServer) GetRandProbe(ctx context.Context, req *Void) (*ProbeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRandProbe not implemented")
 }
 
 func RegisterMapdServer(s *grpc.Server, srv MapdServer) {
@@ -493,20 +623,38 @@ func _Mapd_Replicate_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Mapd_GetSum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
+func _Mapd_GetDefiProbe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProbeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MapdServer).GetSum(ctx, in)
+		return srv.(MapdServer).GetDefiProbe(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mapd.Mapd/GetSum",
+		FullMethod: "/mapd.Mapd/GetDefiProbe",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MapdServer).GetSum(ctx, req.(*GetRequest))
+		return srv.(MapdServer).GetDefiProbe(ctx, req.(*ProbeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Mapd_GetRandProbe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Void)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MapdServer).GetRandProbe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mapd.Mapd/GetRandProbe",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MapdServer).GetRandProbe(ctx, req.(*Void))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -532,8 +680,12 @@ var _Mapd_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Mapd_Replicate_Handler,
 		},
 		{
-			MethodName: "getSum",
-			Handler:    _Mapd_GetSum_Handler,
+			MethodName: "getDefiProbe",
+			Handler:    _Mapd_GetDefiProbe_Handler,
+		},
+		{
+			MethodName: "getRandProbe",
+			Handler:    _Mapd_GetRandProbe_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

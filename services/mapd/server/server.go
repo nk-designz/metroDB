@@ -38,12 +38,6 @@ func (server *MapdServer) Replicate(ctx context.Context, request *pb.Entry) (*pb
 	return new(pb.Void), nil
 }
 
-func (server *MapdServer) GetSum(ctx context.Context, request *pb.GetRequest) (*pb.GetReply, error) {
-	reply := new(pb.GetReply)
-	reply.Value = server.mapd.getSum(request.Key)
-	return reply, nil
-}
-
 func newMapdServer() *MapdServer {
 	mapdServerInstance := new(MapdServer)
 	mapdServerInstance.mapd = new(Mapd)

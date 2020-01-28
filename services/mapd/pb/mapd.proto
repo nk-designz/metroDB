@@ -7,7 +7,8 @@ service Mapd {
     rpc setSafe (SetRequest) returns (SetReply) {}
     rpc get (GetRequest) returns (GetReply) {}
     rpc replicate (Entry) returns (Void) {}
-    rpc getSum (GetRequest) returns (GetReply) {}
+    rpc getDefiProbe (ProbeRequest) returns (ProbeReply) {}
+    rpc getRandProbe (Void) returns (ProbeReply) {}
 }
 
 message GetRequest {
@@ -35,3 +36,15 @@ message Entry {
 }
 
 message Void {}
+
+message ProbeRequest {
+    string key = 1;
+    uint64 deph = 2;
+}
+
+message ProbeReply {
+    string key = 1;
+    int64  offset = 2;
+    bytes  hash = 3;
+    bytes  value = 4;
+}

@@ -152,11 +152,11 @@ func (mapd *Mapd) setReplica(key string, replica Replica) {
 }
 
 func (mapd *Mapd) getDefiProbe(key string, deph uint64) (string, int64, []byte, []byte, error) {
-		return key, 
-			mapd.index.memory[key][deph].Offset,
-			mapd.logds[mapd.index.memory[key][deph].LogStore].logd.Get(mapd.index.memory[key][deph].Sum),
-			mapd.get(key),
-			nil
+	return key,
+		mapd.index.memory[key][deph].Offset,
+		mapd.logds[mapd.index.memory[key][deph].LogStore].logd.Get(mapd.index.memory[key][deph].Sum),
+		mapd.get(key),
+		nil
 }
 
 func (mapd *Mapd) getRandProbe() (string, int64, []byte, []byte, error) {
@@ -165,7 +165,6 @@ func (mapd *Mapd) getRandProbe() (string, int64, []byte, []byte, error) {
 	for key, replica := range mapd.index.memory {
 		if interator >= randomBreak {
 			return key, replica[0].Offset, mapd.logds[replica[0].LogStore].logd.Get(replica[0].Sum), mapd.get(key), nil
-			break
 		}
 		interator++
 	}

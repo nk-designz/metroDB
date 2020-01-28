@@ -11,10 +11,10 @@ import (
 type cluster []*mapdClient.Mapd
 
 func main() {
-	os.Hostname()
-	var mapds cluster
-	for index, hostname := range(os.Args) {
+	mapds := make(cluster, len(os.Args)-1)
+	for index, hostname := range os.Args {
 		if index != 0 {
+			fmt.Println(index)
 			mapds[index-1] = mapdClient.New(hostname)
 		}
 	}

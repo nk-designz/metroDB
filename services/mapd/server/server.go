@@ -33,7 +33,8 @@ func (server *MapdServer) Get(ctx context.Context, request *pb.GetRequest) (*pb.
 func (server *MapdServer) Replicate(ctx context.Context, request *pb.Entry) (*pb.Void, error) {
 	server.mapd.setReplica(request.Key, Replica{
 		LogStore: int(request.LogStore),
-		Offset:   request.Offset})
+		Offset:   request.Offset,
+		Sum:      request.SumOffset})
 	return new(pb.Void), nil
 }
 

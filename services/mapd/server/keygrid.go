@@ -7,6 +7,8 @@ import (
 	"sort"
 	"time"
 
+	"lukechampine.com/blake3"
+
 	logd "github.com/nk-designz/metroDB/services/logd/client"
 	mapdClient "github.com/nk-designz/metroDB/services/mapd/client"
 	pb "github.com/nk-designz/metroDB/services/mapd/pb"
@@ -15,6 +17,7 @@ import (
 type Replica struct {
 	LogStore int
 	Offset   int64
+	Sum      int64
 }
 
 type Logds struct {
@@ -88,14 +91,17 @@ func (mapd *Mapd) set(key string, value []byte) {
 	sort.Slice(mapd.logds, func(i, j int) bool {
 		return mapd.logds[i].size > mapd.logds[j].size
 	})
+	hashValue := blake3.Sum512(value)
 	for logdIndex := range []int{0, 1} {
 		logdInstance := mapd.logds[logdIndex].logd
 		logdInstance.Connect()
 		valueOffset := logdInstance.Append(value)
+		hashOffset := logdInstance.Append(hashValue[:])
 		mapd.logds[logdIndex].size = valueOffset
 		replica := Replica{
 			Offset:   valueOffset,
-			LogStore: logdIndex}
+			LogStore: logdIndex,
+			Sum:      hashOffset}
 		if replicas, ok := mapd.index.memory[key]; ok {
 			mapd.index.memory[key] = append(replicas, replica)
 		} else {

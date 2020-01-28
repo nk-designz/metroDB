@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
+	mapdClient "github.com/nk-designz/metroDB/services/mapd/client"
 )
 
 func main() {
-	logds := new(Logds)
-	logds.Init()
-	defer logds.Close()
-	for _, logd := range logds.logds {
-		fmt.Println(logd.Get(898))
-	}
+	hostname, _ := os.Hostname()
+	log.Println(
+		fmt.Println(
+			mapdClient.New(hostname)))
 }

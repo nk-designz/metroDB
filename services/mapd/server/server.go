@@ -38,6 +38,18 @@ func (server *MapdServer) Replicate(ctx context.Context, request *pb.Entry) (*pb
 	return new(pb.Void), nil
 }
 
+func (server *MapdServer) RandProbe(ctx context.Context, request *pb.Void) (*pb.ProbeReply, error) {
+	reply := new(pb.ProbeReply)
+	reply.Key, reply.Offset, reply.Hash, reply.Value, err = server.mapd.getRandProbe()
+	return reply, err
+}
+
+func (server *MapdServer) DefiProbe(ctx context.Context, request *pb.ProbeRequest) (*pb.ProbeReply, error) {
+	reply := new(pb.ProbeReply)
+	reply.Key, reply.Offset, reply.Hash, reply.Value, err = server.mapd.getDefiProbe(request.Key, request.Deph)
+	return reply, err
+}
+
 func newMapdServer() *MapdServer {
 	mapdServerInstance := new(MapdServer)
 	mapdServerInstance.mapd = new(Mapd)

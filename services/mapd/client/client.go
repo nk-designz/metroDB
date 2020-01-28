@@ -43,12 +43,17 @@ func (mapd *Mapd) Replicate(entry *pb.Entry) error {
 	return err
 }
 
-func (mapd *Mapd) GetSum(key string) ([]byte, error) {
-	sum, err := mapd.client.GetSum(context.Background(), &pb.GetRequest{Key: key})
-	return sum.GetValue(), err
-}
-
 func (mapd *Mapd) Get(key string) ([]byte, error) {
 	value, err := mapd.client.Get(context.Background(), &pb.GetRequest{Key: key})
 	return value.GetValue(), err
+}
+
+func (mapd *Mapd) GetRandProbe() (string, int64, []byte, []byte, error) {
+	reply, err := mapd.client.GetRandProbe(context.Background(), &pb.Void{})
+	return reply.GetKey(), reply.GetOffset(), reply.GetHash(), reply.GetValue(), err
+}
+
+func (mapd *Mapd) GetDefiProbe(key string, deph uint64) (string, int64, []byte, []byte, error) {
+	reply, err := mapd.client.GetDefiProbe(context.Background(), &pb.ProbeRequest{Key: key, Deph: deph})
+	return reply.GetKey(), reply.GetOffset(), reply.GetHash(), reply.GetValue(), err
 }

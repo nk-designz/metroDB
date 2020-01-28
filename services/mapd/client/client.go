@@ -3,10 +3,9 @@ package mapd
 import (
 	"context"
 	"fmt"
-	"log"
 
-	pb "github.com/nk-designz/metroDB/services/mapd/pb"
 	"google.golang.org/grpc"
+	pb "github.com/nk-designz/metroDB/services/mapd/pb"
 )
 
 type Mapd struct {
@@ -22,23 +21,21 @@ func New(address string) *Mapd {
 	return mapdInstance
 }
 
-func (mapd *Mapd) Connect() {
+func (mapd *Mapd) Connect() error {
 	var err error
 	mapd.connection, err = grpc.Dial(mapd.address, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
 	mapd.client = pb.NewMapdClient(mapd.connection)
+	return err
 }
 
 func (mapd *Mapd) Set(key string, value []byte) (bool, error) {
 	t, err := mapd.client.Set(context.Background(), &pb.SetRequest{Key: key, Value: value})
-	return t.Err, err
+	return t.GetErr(), err
 }
 
 func (mapd *Mapd) SetSafe(key string, value []byte) (bool, error) {
 	t, err := mapd.client.SetSafe(context.Background(), &pb.SetRequest{Key: key, Value: value})
-	return t.Err, err
+	return t.GetErr(), err
 }
 
 func (mapd *Mapd) Replicate(entry *pb.Entry) error {
@@ -49,14 +46,10 @@ func (mapd *Mapd) Replicate(entry *pb.Entry) error {
 
 func (mapd *Mapd) GetSum(key string) ([]byte, error) {
 	sum, err := mapd.client.GetSum(context.Background(), &pb.GetRequest{Key: key})
-	return sum.Value, err
+	return sum.GetValue(), err
 }
 
 func (mapd *Mapd) Get(key string) ([]byte, error) {
 	value, err := mapd.client.Get(context.Background(), &pb.GetRequest{Key: key})
-	if err != nil {
-		log.Println(
-			fmt.Sprintf(`msg="could not get key" key="%s" error="%v"`, key, err))
-	}
 	return value.GetValue(), err
 }

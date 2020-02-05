@@ -1,0 +1,6 @@
+project: metrodb
+configVersion: 1
+---
+image: nicokahlert/metrodb
+dockerfile: /container/alpine/Dockerfile
+

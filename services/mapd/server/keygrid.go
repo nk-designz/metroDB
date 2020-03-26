@@ -88,7 +88,7 @@ func (mapd *Mapd) retrivePersistentIndex() error {
 
 func (mapd *Mapd) set(key string, value []byte) {
 	sort.Slice(mapd.logds, func(i, j int) bool {
-		return mapd.logds[i].size > mapd.logds[j].size
+		return mapd.logds[i].size < mapd.logds[j].size
 	})
 	hashValue := blake3.Sum512(value)
 	for logdIndex := range []int{0, 1} {
@@ -128,17 +128,24 @@ func (mapd *Mapd) setSafe(key string, value []byte) {
 
 func (mapd *Mapd) get(key string) []byte {
 	log.Println(`msg="get key"`, key)
-	if entrys, exist := mapd.index.memory[key]; exist {
-		replic := len(entrys) - 1
-		logd := mapd.logds[entrys[replic].LogStore].logd
-		offset := entrys[replic].Offset
-		logd.Connect()
-		defer logd.Close()
-		return logd.Get(offset)
-	} else {
+	if entrys, exist := mapd.index.memory[key]; !exist {
 		log.Println(`msg="key not found"`)
 		return []byte{}
 	}
+	for replic := len(entrys) - 1; replic < 0; n-- {
+		logd := mapd.logds[entrys[replic].LogStore].logd
+		logd.Connect()
+		value := logd.Get(entrys[replic].Offset)
+		sum := logd.Get(entrys[replic].Sum)
+		logd.Close()
+		if(sum != blake3.Sum512(value)) {
+			log.Println(`msg="broken replica! moving on..."`)
+			continue
+		}
+		return value
+	}
+	log.Println(`msg="no valid replicas"`)
+	return []byte
 }
 
 func (mapd *Mapd) setReplica(key string, replica Replica) {

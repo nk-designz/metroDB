@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 	"time"
+	"bytes"
 
 	"lukechampine.com/blake3"
 
@@ -140,7 +141,7 @@ func (mapd *Mapd) get(key string) []byte {
 		sum := logd.Get(entrys[replic].Sum)
 		logd.Close()
 		valueHash := blake3.Sum512(value)
-		if(string(sum) != string(valueHash[:])) {
+		if(!bytes.Equal(sum, valueHash[:])) {
 			log.Println(`msg="broken replica! moving on..."`)
 			continue
 		}

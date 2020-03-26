@@ -12,7 +12,7 @@ spec:
     command:
       - /bin/mapd-util
     args:
-      - metrodb.metrodb.svc.cluster.local
+      - metrodb
       - serve
       - '7080'
     resources:

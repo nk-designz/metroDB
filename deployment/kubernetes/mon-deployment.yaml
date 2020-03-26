@@ -18,9 +18,9 @@ spec:
         command:
           - /bin/mond
         args:
-          - mapd-0.mapd.metrodb.svc.cluster.local
-          - mapd-1.mapd.metrodb.svc.cluster.local
-          - mapd-2.mapd.metrodb.svc.cluster.local
+          - mapd-0.mapd
+          - mapd-1.mapd
+          - mapd-2.mapd
         resources:
           limits:
             memory: "128Mi"

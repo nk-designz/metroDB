@@ -134,15 +134,18 @@ func (mapd *Mapd) get(key string) []byte {
 		log.Println(`msg="key not found"`)
 		return []byte{}
 	}
-	entry := entrys[(len(entrys) - 1)]
-	logd := mapd.logds[entry.LogStore].logd
-	logd.Connect()
-	value := logd.Get(entry.Offset)
-	sum := logd.Get(entry.Sum)
-	logd.Close()
-	valueHash := blake3.Sum512(value)
-	if(bytes.Equal(sum, valueHash[:])) {
-		return value
+	for replic := (len(entrys) - 1); replic > 0; replic-- {
+		entry := entrys[replic]
+		logd := mapd.logds[entry.LogStore].logd
+		logd.Connect()
+		value := logd.Get(entry.Offset)
+		sum := logd.Get(entry.Sum)
+		logd.Close()
+		valueHash := blake3.Sum512(value)
+		if(bytes.Equal(sum, valueHash[:])) {
+			return value
+		}
+		log.Println(`msg="invalid replica"`)
 	}
 	log.Println(`msg="no valid replicas"`)
 	return []byte{}

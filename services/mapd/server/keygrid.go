@@ -128,24 +128,26 @@ func (mapd *Mapd) setSafe(key string, value []byte) {
 
 func (mapd *Mapd) get(key string) []byte {
 	log.Println(`msg="get key"`, key)
-	if entrys, exist := mapd.index.memory[key]; !exist {
+	entrys, exist := mapd.index.memory[key]
+	if !exist {
 		log.Println(`msg="key not found"`)
 		return []byte{}
 	}
-	for replic := len(entrys) - 1; replic < 0; n-- {
+	for replic := len(entrys) - 1; replic < 0; replic-- {
 		logd := mapd.logds[entrys[replic].LogStore].logd
 		logd.Connect()
 		value := logd.Get(entrys[replic].Offset)
 		sum := logd.Get(entrys[replic].Sum)
 		logd.Close()
-		if(sum != blake3.Sum512(value)) {
+		valueHash := blake3.Sum512(value)
+		if(string(sum) != string(valueHash[:])) {
 			log.Println(`msg="broken replica! moving on..."`)
 			continue
 		}
 		return value
 	}
 	log.Println(`msg="no valid replicas"`)
-	return []byte
+	return []byte{}
 }
 
 func (mapd *Mapd) setReplica(key string, replica Replica) {

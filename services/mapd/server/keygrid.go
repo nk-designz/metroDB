@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/gob"
+	"encoding/json"
 	"log"
 	"math/rand"
 	"os"
@@ -16,9 +16,9 @@ import (
 )
 
 type Replica struct {
-	LogStore int
-	Offset   int64
-	Sum      int64
+	LogStore int   `json:"store"`
+	Offset   int64 `json:"offset"`
+	Sum      int64 `json:"sum"`
 }
 
 type Logds struct {
@@ -31,7 +31,7 @@ type Cluster []*mapdClient.Mapd
 
 type Mapd struct {
 	index struct {
-		memory map[string][]Replica
+		memory map[string][]Replica `json:"index"`
 		disk   *os.File
 		sync   struct {
 			ticker *time.Ticker
@@ -67,8 +67,7 @@ func (mapd *Mapd) sheduleDiskSync() {
 }
 
 func (mapd *Mapd) updatePersistentIndex() error {
-	encoder := gob.NewEncoder(mapd.index.disk)
-	err := encoder.Encode(mapd.index.memory)
+	err := json.NewEncoder(mapd.index.disk).Encode(mapd.index.memory)
 	if err != nil {
 		panic(err)
 	}
@@ -82,8 +81,7 @@ func (mapd *Mapd) retrivePersistentIndex() error {
 	}
 	memoryIndex := make(map[string][]Replica, filestat.Size())
 	log.Println(`msg="retrieving map from disk..."`)
-	decoder := gob.NewDecoder(mapd.index.disk)
-	err = decoder.Decode(&memoryIndex)
+	err = json.NewDecoder(mapd.index.disk).Decode(&memoryIndex)
 	mapd.index.memory = memoryIndex
 	return err
 }

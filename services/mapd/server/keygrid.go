@@ -134,7 +134,7 @@ func (mapd *Mapd) get(key string) []byte {
 		log.Println(`msg="key not found"`)
 		return []byte{}
 	}
-	for _, entry := entrys {
+	for _, entry := range entrys {
 		logd := mapd.logds[entry.LogStore].logd
 		logd.Connect()
 		value := logd.Get(entry.Offset)

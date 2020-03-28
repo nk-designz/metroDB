@@ -5,6 +5,7 @@ import(
 	"fmt"
 	"os"
 	"flag"
+	"time"
 	"strings"
 	"math/rand"
 
@@ -47,7 +48,12 @@ func (mapd *Mapd) init() error {
 	}
 	for index, name := range mapds {
 		mapd.cluster[index] = mapdClient.New(name)
-		mapd.cluster[index].Connect()
+		for {
+			if mapd.cluster[index].Connect() == nil {
+				break
+			}
+			time.Sleep(1 * time.Second)
+		}
 	}
 	return err
 }

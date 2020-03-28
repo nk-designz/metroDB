@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"math/rand"
 	"os"
 	"sort"
 	"time"
-	"bytes"
 
 	"lukechampine.com/blake3"
 
@@ -142,7 +142,7 @@ func (mapd *Mapd) get(key string) []byte {
 		sum := logd.Get(entry.Sum)
 		logd.Close()
 		valueHash := blake3.Sum512(value)
-		if(bytes.Equal(sum, valueHash[:])) {
+		if bytes.Equal(sum, valueHash[:]) {
 			return value
 		}
 		log.Println(`msg="invalid replica"`)
@@ -152,6 +152,7 @@ func (mapd *Mapd) get(key string) []byte {
 }
 
 func (mapd *Mapd) setReplica(key string, replica Replica) {
+	log.Println(`msg="replicated"`)
 	if replicas, ok := mapd.index.memory[key]; ok {
 		mapd.index.memory[key] = append(replicas, replica)
 	} else {

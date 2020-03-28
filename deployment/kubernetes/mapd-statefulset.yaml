@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: mapd 
-        image: nicokahlert/metrodb
+        image: nicokahlert/metrodb@sha256:322c3f033ee14248ab21a3eeb387dcfb521a3512d360afcf62fae8048e629e5b
         env:
         - name: MAPD_INDEX_PATH
           value: /var/metrodb/mapd

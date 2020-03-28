@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mond
-        image: nicokahlert/metrodb
+        image: nicokahlert/metrodb@sha256:322c3f033ee14248ab21a3eeb387dcfb521a3512d360afcf62fae8048e629e5b
         command:
           - /bin/mond
         args:

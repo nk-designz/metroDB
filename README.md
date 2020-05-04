@@ -1,5 +1,5 @@
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/nicokahlert/metrodb?style=flat-square)  
-![Logo](https://raw.githubusercontent.com/nk-designz/metroDB/master/assets/images/logo.png)  
+<img height="100px" width="auto" src="https://raw.githubusercontent.com/nk-designz/metroDB/master/assets/images/logo.png" />
 # MetroDB
 A distributed, scalable NoSQL Datastore based on immutable logs.
 # Components
